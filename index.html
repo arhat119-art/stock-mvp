@@ -3,76 +3,67 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#111827">
-<title>台股狩獵場 MVP</title>
+<title>台股狩獵場 v2</title>
 <style>
-*{box-sizing:border-box}body{margin:0;background:#f4f6f8;color:#172033;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans TC","Microsoft JhengHei",sans-serif}
-button,input,select,textarea{font:inherit}button{cursor:pointer}
-.wrap{max-width:760px;margin:auto;padding:18px 14px 36px}.top{display:flex;justify-content:space-between;align-items:end;gap:12px;flex-wrap:wrap}
-h1{font-size:24px;margin:0 0 5px}.muted{color:#697386;font-size:13px}
-.grid{display:grid;gap:10px}.stocks{margin-top:16px}.stock{width:100%;text-align:left;background:#fff;border:1px solid #dfe3e8;border-radius:14px;padding:13px}.stock.active{border:2px solid #3157d5;background:#f3f6ff}
-.row{display:flex;justify-content:space-between;gap:8px;align-items:center}.name{font-weight:700}.pill{font-size:12px;border-radius:999px;padding:5px 8px;background:#eef1f5;white-space:nowrap}
-.card{background:#fff;border:1px solid #dfe3e8;border-radius:16px;padding:16px;margin-top:14px}.metrics{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}.metric{background:#f5f6f8;border-radius:10px;padding:10px}.metric small{display:block;color:#697386;font-size:12px}.metric strong{font-size:18px}
-label{display:block;font-size:13px;font-weight:700;margin:14px 0 6px}select,textarea{width:100%;border:1px solid #d7dce3;border-radius:10px;padding:11px;background:#fff;color:#172033}textarea{min-height:92px;resize:vertical}
-.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}button.action{min-height:44px;border:0;border-radius:11px;padding:0 15px;font-weight:700;background:#3157d5;color:white}button.secondary{background:white;color:#172033;border:1px solid #d7dce3}
-.summary{margin-top:14px;background:#111827;color:white;border-radius:16px;padding:14px}.summary b{font-size:18px}.empty{color:#697386;padding:20px;text-align:center}
-@media(max-width:420px){.wrap{padding:14px 10px}.metrics{grid-template-columns:1fr 1fr}}
+body{margin:0;background:#f4f5f7;font-family:system-ui,-apple-system,"Noto Sans TC",sans-serif;color:#222}
+header{background:#111827;color:#fff;padding:18px 16px}h1{margin:0;font-size:24px}.sub{font-size:13px;opacity:.75;margin-top:4px}
+main{max-width:720px;margin:auto;padding:14px}.tools,.filters{display:flex;gap:7px;overflow:auto;margin-bottom:12px}.tools button,.filters button{white-space:nowrap}
+button,input,select,textarea{font:inherit;border:1px solid #d1d5db;border-radius:9px;padding:9px;background:#fff}button{cursor:pointer}.primary{background:#111827;color:#fff}
+.card{background:#fff;border-radius:14px;padding:15px;margin:10px 0;box-shadow:0 2px 8px #0001}.row{display:flex;justify-content:space-between;gap:8px}
+.name{font-weight:700;font-size:19px}.code{color:#777;font-size:13px}.badge{font-size:12px;background:#eef2ff;padding:5px 8px;border-radius:99px;white-space:nowrap}
+.meta{font-size:14px;line-height:1.7;margin-top:9px}.actions{display:flex;gap:7px;margin-top:10px}.actions button{flex:1}
+dialog{border:0;border-radius:16px;width:min(92vw,520px);padding:0}dialog::backdrop{background:#0008}.modal{padding:18px}
+label{display:block;font-size:13px;font-weight:600;margin:9px 0 4px}input,select,textarea{width:100%;box-sizing:border-box}textarea{min-height:80px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.full{grid-column:1/-1}.save{display:flex;gap:8px;margin-top:15px}.save button{flex:1}
+.note{font-size:12px;color:#666}.empty{text-align:center;color:#777;padding:35px}
 </style>
 </head>
 <body>
-<main class="wrap" id="app">
-  <div class="top">
-    <div><h1>我的台股狩獵場</h1><div class="muted">第一版 MVP · 先測試你的實際使用流程</div></div>
-    <span class="pill" id="count"></span>
-  </div>
-  <section class="stocks grid" id="stocks"></section>
-  <section class="card" id="detail"></section>
-  <div class="summary"><div class="muted" style="color:#c7ced9">目前口袋名單</div><b id="pocketCount"></b><div id="pocketNames" class="muted" style="color:#c7ced9;margin-top:5px"></div></div>
+<header><h1>台股狩獵場</h1><div class="sub">v2｜記錄第一直覺 → 後續驗證 → 修改</div></header>
+<main>
+<div class="tools"><button class="primary" onclick="newStock()">＋ 新增標的</button><button onclick="exportData()">匯出紀錄</button></div>
+<div class="filters" id="filters"></div><div id="list"></div>
 </main>
+<dialog id="dlg"><div class="modal">
+<h2 id="title">新增標的</h2><div class="note">先記下當下第一直覺，之後再回來驗證。</div>
+<input type="hidden" id="id">
+<div class="grid">
+<div><label>股票名稱</label><input id="name" placeholder="例如 正崴"></div>
+<div><label>股票代號</label><input id="code" placeholder="例如 2392"></div>
+<div class="full"><label>型態</label><select id="pattern"><option>週K破底翻</option><option>突破 → 回測不破</option><option>日K破底翻</option><option>其他觀察</option></select></div>
+<div><label>關鍵價格</label><input id="key" inputmode="decimal"></div>
+<div><label>試單價格</label><input id="entry" inputmode="decimal"></div>
+<div><label>停損價格</label><input id="stop" inputmode="decimal"></div>
+<div><label>狀態</label><select id="status"><option>第一直覺</option><option>接近試單</option><option>等待回測</option><option>已持有</option><option>暫不考慮</option><option>已驗證</option></select></div>
+<div class="full"><label>第一直覺／備註</label><textarea id="memo" placeholder="例如：32附近守住願意試單……"></textarea></div>
+</div>
+<div class="save"><button onclick="dlg.close()">取消</button><button class="primary" onclick="save()">儲存</button></div>
+</div></dialog>
 <script>
+const STORE="stock_hunting_v2";
 const initial=[
- {code:"正崴",pattern:"突破後回測不破",key:"待確認",price:"—",status:"🟢 接近試單",note:"今天收盤已試單 2 張。觀察突破後回測。",pocket:true},
- {code:"華榮",pattern:"破底翻／等待回測",key:"32",price:"—",status:"🟡 等待關鍵價",note:"32附近才有興趣，目前不追。",pocket:true},
- {code:"新鉅科",pattern:"破底翻",key:"26",price:"—",status:"🔴 暫不考慮",note:"今日漲幅已大，先不追。",pocket:false},
- {code:"鑽石投資",pattern:"突破／回測觀察",key:"16",price:"18.2",status:"🔵 已持有",note:"持有部位，觀察轉強與回測。",pocket:true}
-];
-let stocks=JSON.parse(localStorage.getItem("stockMvpData")||"null")||initial;
-let selected=0;
-const $=id=>document.getElementById(id);
-function save(){localStorage.setItem("stockMvpData",JSON.stringify(stocks))}
+{name:"正崴",code:"2392",pattern:"突破 → 回測不破",key:"",entry:"",stop:"",status:"接近試單",memo:"第一版範例"},
+{name:"華榮",code:"1608",pattern:"週K破底翻",key:"32",entry:"",stop:"",status:"等待回測",memo:"等32附近觀察是否守住"},
+{name:"新鉅科",code:"3630",pattern:"週K破底翻",key:"",entry:"",stop:"",status:"暫不考慮",memo:"近期漲幅較大"},
+{name:"鑽石投資",code:"6901",pattern:"週K破底翻",key:"",entry:"",stop:"",status:"已持有",memo:"持續觀察"}
+].map(x=>({...x,id:crypto.randomUUID()}));
+let data=JSON.parse(localStorage.getItem(STORE)||"null")||initial, current="全部";
+const $=id=>document.getElementById(id), esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function saveStore(){localStorage.setItem(STORE,JSON.stringify(data))}
 function render(){
- $("count").textContent=`候選 ${stocks.length} 檔`;
- $("stocks").innerHTML=stocks.map((s,i)=>`
- <button class="stock ${i===selected?"active":""}" data-i="${i}">
-  <div class="row"><span class="name">${s.code}</span><span class="pill">${s.status}</span></div>
-  <div class="muted" style="margin-top:5px">${s.pattern} · 關鍵價 ${s.key}</div>
- </button>`).join("");
- document.querySelectorAll(".stock").forEach(b=>b.onclick=()=>{selected=+b.dataset.i;render()});
- const s=stocks[selected];
- $("detail").innerHTML=`
-  <div class="row"><div><h2 style="margin:0 0 4px;font-size:20px">${s.code}</h2><div class="muted">${s.pattern}</div></div><span class="pill">${s.status}</span></div>
-  <div class="metrics">
-   <div class="metric"><small>關鍵價</small><strong>${s.key}</strong></div>
-   <div class="metric"><small>示範現價</small><strong>${s.price}</strong></div>
-  </div>
-  <label for="status">我的狀態</label>
-  <select id="status">
-   ${["🟢 接近試單","🟡 等待關鍵價","⚪ 持續觀察","🔴 暫不考慮","🔵 已持有"].map(x=>`<option ${x===s.status?"selected":""}>${x}</option>`).join("")}
-  </select>
-  <label for="key">關鍵價格</label><input id="key" value="${s.key}" style="width:100%;padding:11px;border:1px solid #d7dce3;border-radius:10px">
-  <label for="note">我的判斷</label><textarea id="note">${s.note}</textarea>
-  <div class="actions">
-   <button class="action" id="save">儲存判斷</button>
-   <button class="action secondary" id="pocket">${s.pocket?"★ 已在口袋名單":"☆ 加入口袋名單"}</button>
-  </div>`;
- $("save").onclick=()=>{
-   s.status=$("status").value;s.key=$("key").value.trim()||"待確認";s.note=$("note").value.trim()||"尚未留下判斷。";save();render();flash("已儲存 "+s.code+" 的判斷");
- };
- $("pocket").onclick=()=>{s.pocket=!s.pocket;save();render();flash(s.pocket?"已加入口袋名單":"已移出口袋名單")};
- const p=stocks.filter(x=>x.pocket);$("pocketCount").textContent=`${p.length} 檔`;$("pocketNames").textContent=p.map(x=>x.code).join("、")||"目前沒有";
+ let sts=["全部","第一直覺","接近試單","等待回測","已持有","暫不考慮","已驗證"];
+ $("filters").innerHTML=sts.map(s=>`<button onclick="current='${s}';render()">${s}</button>`).join("");
+ let a=current==="全部"?data:data.filter(x=>x.status===current);
+ $("list").innerHTML=a.length?a.map(x=>`<div class="card"><div class="row"><div><span class="name">${esc(x.name)}</span> <span class="code">${esc(x.code)}</span></div><span class="badge">${esc(x.status)}</span></div>
+ <div class="meta"><b>型態：</b>${esc(x.pattern)}<br><b>關鍵價格：</b>${esc(x.key||"待確認")}${x.entry?`<br><b>試單價格：</b>${esc(x.entry)}`:""}${x.stop?`<br><b>停損價格：</b>${esc(x.stop)}`:""}${x.memo?`<br><b>紀錄：</b>${esc(x.memo)}`:""}</div>
+ <div class="actions"><button onclick="edit('${x.id}')">✏️ 編輯</button><button onclick="removeStock('${x.id}')">🗑️ 刪除</button></div></div>`).join(""):'<div class="empty">目前沒有符合條件的標的</div>';
 }
-function flash(t){let e=document.createElement("div");e.textContent=t;e.style="position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#111827;color:white;padding:11px 16px;border-radius:12px;z-index:10";document.body.appendChild(e);setTimeout(()=>e.remove(),1400)}
+function newStock(){fill({});$("title").textContent="新增標的";$("dlg").showModal()}
+function fill(x){["id","name","code","key","entry","stop","memo"].forEach(k=>$(k).value=x[k]||"");$("pattern").value=x.pattern||"週K破底翻";$("status").value=x.status||"第一直覺"}
+function edit(id){let x=data.find(x=>x.id===id);fill(x);$("title").textContent="修改標的";$("dlg").showModal()}
+function save(){let id=$("id").value;let x={id:id||crypto.randomUUID(),name:$("name").value.trim(),code:$("code").value.trim(),pattern:$("pattern").value,key:$("key").value.trim(),entry:$("entry").value.trim(),stop:$("stop").value.trim(),status:$("status").value,memo:$("memo").value.trim()};if(!x.name){alert("請輸入股票名稱");return}data=id?data.map(y=>y.id===id?x:y):[x,...data];saveStore();$("dlg").close();render()}
+function removeStock(id){let x=data.find(x=>x.id===id);if(confirm("確定刪除 "+x.name+"？")){data=data.filter(x=>x.id!==id);saveStore();render()}}
+function exportData(){let b=new Blob([JSON.stringify(data,null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="台股狩獵場-紀錄.json";a.click()}
 render();
 </script>
-</body>
-</html>
+</body></html>
