@@ -12,7 +12,7 @@
 <style>
 
 /* =========================
-   基本
+   基本設定
 ========================= */
 
 *{
@@ -24,7 +24,9 @@ body{
   background:#f4f5f7;
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans TC",sans-serif;
   color:#222;
+
   opacity:0;
+
   animation:pageIn .45s ease forwards;
 }
 
@@ -32,6 +34,7 @@ body{
   from{
     opacity:0;
   }
+
   to{
     opacity:1;
   }
@@ -45,6 +48,7 @@ body{
 #loadingScreen{
   position:fixed;
   inset:0;
+
   z-index:99999;
 
   display:flex;
@@ -53,9 +57,9 @@ body{
 
   background:
     radial-gradient(
-      circle at 50% 40%,
-      #1e293b 0%,
-      #111827 45%,
+      circle at 50% 42%,
+      #243653 0%,
+      #111827 46%,
       #020617 100%
     );
 
@@ -71,6 +75,7 @@ body{
 #loadingScreen.hide{
   opacity:0;
   visibility:hidden;
+  pointer-events:none;
 }
 
 .loading-glow{
@@ -81,7 +86,7 @@ body{
 
   border-radius:50%;
 
-  background:rgba(96,165,250,.13);
+  background:rgba(96,165,250,.14);
 
   filter:blur(65px);
 
@@ -102,7 +107,9 @@ body{
 
 .loading-version{
   margin-top:5px;
+
   color:#94a3b8;
+
   font-size:13px;
 }
 
@@ -112,12 +119,16 @@ body{
 
   margin:28px auto 16px;
 
-  border:3px solid rgba(255,255,255,.18);
+  border:
+    3px solid
+    rgba(255,255,255,.18);
+
   border-top-color:#fff;
 
   border-radius:50%;
 
-  animation:spin .8s linear infinite;
+  animation:
+    spin .8s linear infinite;
 }
 
 .loading-text{
@@ -155,9 +166,7 @@ header{
   background:#111827;
   color:#fff;
 
-  padding:
-    18px
-    16px;
+  padding:18px 16px;
 
   box-shadow:
     0 3px 14px rgba(0,0,0,.12);
@@ -176,7 +185,7 @@ h1{
 
 
 /* =========================
-   主要區域
+   主要內容
 ========================= */
 
 main{
@@ -223,7 +232,7 @@ main{
 
 
 /* =========================
-   按鈕 / 輸入
+   按鈕
 ========================= */
 
 button,
@@ -236,8 +245,11 @@ textarea{
 
 button{
   border:0;
+
   border-radius:9px;
+
   padding:9px 13px;
+
   cursor:pointer;
 
   transition:
@@ -274,6 +286,11 @@ button:hover{
   color:#222;
 }
 
+
+/* =========================
+   輸入框
+========================= */
+
 input,
 select,
 textarea{
@@ -281,7 +298,9 @@ textarea{
 
   padding:10px;
 
-  border:1px solid #d1d5db;
+  border:
+    1px solid
+    #d1d5db;
 
   border-radius:9px;
 
@@ -301,7 +320,8 @@ textarea:focus{
   border-color:#64748b;
 
   box-shadow:
-    0 0 0 3px rgba(100,116,139,.12);
+    0 0 0 3px
+    rgba(100,116,139,.12);
 }
 
 textarea{
@@ -358,18 +378,79 @@ textarea{
 
 
 /* =========================
+   排版
+========================= */
+
+.row{
+
+  display:flex;
+
+  justify-content:space-between;
+
+  gap:10px;
+
+  align-items:center;
+}
+
+.meta{
+
+  color:#555;
+
+  font-size:14px;
+
+  line-height:1.7;
+
+  margin-top:8px;
+}
+
+.actions{
+
+  display:flex;
+
+  gap:6px;
+
+  margin-top:10px;
+}
+
+.hidden{
+  display:none;
+}
+
+
+/* =========================
+   登入
+========================= */
+
+#loginBox{
+  max-width:420px;
+  margin:30px auto;
+}
+
+.small{
+  font-size:13px;
+  color:#666;
+}
+
+.message{
+  margin-top:8px;
+  color:#c62828;
+  font-size:14px;
+}
+
+
+/* =========================
    股票名稱
 ========================= */
 
 .stock-title{
-
   font-size:18px;
-
   font-weight:700;
 }
 
 
-/* Yahoo 股票連結 */
+/* =========================
+   Yahoo 個股連結
+========================= */
 
 .stock-link{
 
@@ -416,80 +497,15 @@ textarea{
 
 
 /* =========================
-   排版
-========================= */
-
-.row{
-
-  display:flex;
-
-  justify-content:space-between;
-
-  gap:10px;
-
-  align-items:center;
-}
-
-.meta{
-
-  color:#555;
-
-  font-size:14px;
-
-  line-height:1.7;
-
-  margin-top:8px;
-}
-
-.actions{
-
-  display:flex;
-
-  gap:6px;
-
-  margin-top:10px;
-}
-
-.hidden{
-  display:none;
-}
-
-#loginBox{
-
-  max-width:420px;
-
-  margin:30px auto;
-}
-
-.small{
-
-  font-size:13px;
-
-  color:#666;
-}
-
-.message{
-
-  margin-top:8px;
-
-  color:#c62828;
-
-  font-size:14px;
-}
-
-
-/* =========================
-   搜尋區
+   搜尋
 ========================= */
 
 #search{
-
   flex:1;
   min-width:180px;
 }
 
 #filterStatus{
-
   min-width:130px;
 }
 
@@ -501,9 +517,7 @@ textarea{
 @media(max-width:520px){
 
   header{
-    padding:
-      17px
-      14px;
+    padding:17px 14px;
   }
 
   h1{
@@ -522,20 +536,12 @@ textarea{
     grid-column:auto;
   }
 
-  .row{
-    align-items:flex-start;
-  }
-
   header .row{
     align-items:center;
   }
 
   header button{
     padding:9px 11px;
-  }
-
-  .tools{
-    width:100%;
   }
 
   #search{
@@ -546,6 +552,7 @@ textarea{
   #filterStatus{
     width:100%;
   }
+
 }
 
 </style>
@@ -556,7 +563,7 @@ textarea{
 
 
 <!-- =========================
-     Loading
+     Loading 畫面
 ========================= -->
 
 <div id="loadingScreen">
@@ -576,7 +583,7 @@ textarea{
     <div class="loader"></div>
 
     <div class="loading-text">
-      正在載入口袋名單…
+      正在載入口袋名單...
     </div>
 
   </div>
@@ -584,6 +591,10 @@ textarea{
 </div>
 
 
+
+<!-- =========================
+     Header
+========================= -->
 
 <header>
 
@@ -706,7 +717,7 @@ textarea{
 
 
 <!-- =========================
-     管理員新增區
+     管理員區
 ========================= -->
 
 <div
@@ -778,3 +789,1388 @@ textarea{
         </option>
 
         <option>
+          突破回測不破
+        </option>
+
+        <option>
+          日K破底翻
+        </option>
+
+        <option>
+          其他
+        </option>
+
+      </select>
+
+    </div>
+
+
+    <div>
+
+      <label>
+        關鍵價
+      </label>
+
+      <input
+        id="keyPrice"
+        placeholder="例如：32"
+      >
+
+    </div>
+
+
+    <div>
+
+      <label>
+        預計進場
+      </label>
+
+      <input
+        id="entryPrice"
+        placeholder="例如：33"
+      >
+
+    </div>
+
+
+    <div>
+
+      <label>
+        停損
+      </label>
+
+      <input
+        id="stopPrice"
+        placeholder="例如：29"
+      >
+
+    </div>
+
+
+    <div>
+
+      <label>
+        狀態
+      </label>
+
+      <select id="status">
+
+        <option value="watching">
+          觀察
+        </option>
+
+        <option value="ready">
+          準備進場
+        </option>
+
+        <option value="holding">
+          持有
+        </option>
+
+        <option value="closed">
+          已結束
+        </option>
+
+      </select>
+
+    </div>
+
+
+    <div class="full">
+
+      <label>
+        備註
+      </label>
+
+      <textarea
+        id="memo"
+        placeholder="記錄當下第一直覺、型態理由、後續觀察..."
+      ></textarea>
+
+    </div>
+
+  </div>
+
+
+  <div
+    class="tools"
+    style="margin-top:12px"
+  >
+
+    <button
+      class="green"
+      onclick="addStock()"
+    >
+      ＋新增標的
+    </button>
+
+
+    <button
+      class="gray"
+      onclick="clearForm()"
+    >
+      清除
+    </button>
+
+  </div>
+
+</div>
+
+
+
+<!-- =========================
+     搜尋區
+========================= -->
+
+<div class="card">
+
+  <div class="tools">
+
+    <input
+      id="search"
+      placeholder="搜尋股票名稱或代號"
+      oninput="render()"
+    >
+
+
+    <select
+      id="filterStatus"
+      onchange="render()"
+    >
+
+      <option value="">
+        全部狀態
+      </option>
+
+      <option value="watching">
+        觀察
+      </option>
+
+      <option value="ready">
+        準備進場
+      </option>
+
+      <option value="holding">
+        持有
+      </option>
+
+      <option value="closed">
+        已結束
+      </option>
+
+    </select>
+
+  </div>
+
+
+  <div class="row">
+
+    <div>
+
+      <strong>
+        口袋名單
+      </strong>
+
+      <span
+        id="count"
+        class="small"
+      ></span>
+
+    </div>
+
+
+    <span
+      id="userStatus"
+      class="small"
+    >
+      目前為訪客模式
+    </span>
+
+  </div>
+
+</div>
+
+
+
+<!-- =========================
+     股票列表
+========================= -->
+
+<div id="list"></div>
+
+
+</main>
+
+
+
+<script>
+
+
+/* =========================
+   Supabase 設定
+========================= */
+
+const SUPABASE_URL =
+"https://dfzmpdllwggmowqxmfnm.supabase.co";
+
+const SUPABASE_KEY =
+"sb_publishable_MlI3Rkr5IbhQVmhUZV8Z6g_mNQ3r0fR";
+
+
+const sb =
+window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
+
+let stocks = [];
+
+let currentUser = null;
+
+let editingId = null;
+
+
+/* =========================
+   Loading
+========================= */
+
+/*
+  注意：
+  Loading 不等待 Supabase。
+
+  最多約 1.2 秒就會消失，
+  因此即使網路慢也不會卡死。
+*/
+
+let loadingHidden = false;
+
+
+function hideLoading(){
+
+  if(loadingHidden){
+    return;
+  }
+
+  loadingHidden = true;
+
+
+  const screen =
+    document.getElementById(
+      "loadingScreen"
+    );
+
+
+  if(screen){
+
+    screen.classList.add("hide");
+
+  }
+
+}
+
+
+/*
+  保險機制：
+
+  網站啟動後 1.2 秒，
+  Loading 一定會消失。
+*/
+
+setTimeout(
+  hideLoading,
+  1200
+);
+
+
+
+/* =========================
+   Yahoo 股市連結
+========================= */
+
+function yahooUrl(symbol){
+
+  const code =
+    String(symbol || "")
+      .trim()
+      .toUpperCase();
+
+
+  /*
+    例如：
+
+    1605
+    2392
+    6901
+
+    自動變成：
+
+    1605.TW
+    2392.TW
+    6901.TW
+  */
+
+  if(
+    !/^\d{4,6}$/.test(code)
+  ){
+
+    return "#";
+
+  }
+
+
+  return (
+    "https://tw.stock.yahoo.com/quote/"
+    +
+    code
+    +
+    ".TW"
+  );
+
+}
+
+
+
+/* =========================
+   初始化
+========================= */
+
+async function init(){
+
+  try{
+
+    /*
+      取得目前登入狀態
+    */
+
+    const {data} =
+      await sb.auth.getSession();
+
+
+    currentUser =
+      data.session
+      ? data.session.user
+      : null;
+
+
+    updateAuthUI();
+
+
+    /*
+      載入股票資料
+    */
+
+    await loadData();
+
+
+    /*
+      監聽登入 / 登出
+    */
+
+    sb.auth.onAuthStateChange(
+      (_event,session)=>{
+
+        currentUser =
+          session
+          ? session.user
+          : null;
+
+
+        updateAuthUI();
+
+      }
+    );
+
+  }
+
+  catch(error){
+
+    console.error(
+      "初始化失敗：",
+      error
+    );
+
+  }
+
+}
+
+
+/* =========================
+   載入資料
+========================= */
+
+async function loadData(){
+
+  try{
+
+    const {data,error} =
+      await sb
+        .from("pocket_stocks")
+        .select("*")
+        .order(
+          "created_at",
+          {
+            ascending:false
+          }
+        );
+
+
+    if(error){
+
+      console.error(error);
+
+
+      document.getElementById(
+        "list"
+      ).innerHTML =
+
+        `<div class="card">
+          讀取資料失敗：
+          ${escapeHtml(error.message)}
+        </div>`;
+
+      return;
+
+    }
+
+
+    stocks =
+      data || [];
+
+
+    render();
+
+  }
+
+  catch(error){
+
+    console.error(
+      "讀取資料失敗：",
+      error
+    );
+
+  }
+
+}
+
+
+/* =========================
+   登入 UI
+========================= */
+
+function updateAuthUI(){
+
+  const adminPanel =
+    document.getElementById(
+      "adminPanel"
+    );
+
+
+  const loginBtn =
+    document.getElementById(
+      "loginBtn"
+    );
+
+
+  const logoutBtn =
+    document.getElementById(
+      "logoutBtn"
+    );
+
+
+  const userStatus =
+    document.getElementById(
+      "userStatus"
+    );
+
+
+  if(currentUser){
+
+    adminPanel
+      .classList
+      .remove("hidden");
+
+
+    loginBtn
+      .classList
+      .add("hidden");
+
+
+    logoutBtn
+      .classList
+      .remove("hidden");
+
+
+    userStatus.textContent =
+      "🔐 管理員已登入";
+
+  }
+
+  else{
+
+    adminPanel
+      .classList
+      .add("hidden");
+
+
+    loginBtn
+      .classList
+      .remove("hidden");
+
+
+    logoutBtn
+      .classList
+      .add("hidden");
+
+
+    userStatus.textContent =
+      "目前為訪客模式";
+
+  }
+
+
+  render();
+
+}
+
+
+/* =========================
+   登入視窗
+========================= */
+
+function showLogin(){
+
+  document
+    .getElementById("loginBox")
+    .classList
+    .remove("hidden");
+
+
+  document
+    .getElementById("loginEmail")
+    .focus();
+
+}
+
+
+function hideLogin(){
+
+  document
+    .getElementById("loginBox")
+    .classList
+    .add("hidden");
+
+
+  document
+    .getElementById("loginMessage")
+    .textContent="";
+
+}
+
+
+/* =========================
+   登入
+========================= */
+
+async function login(){
+
+  const email =
+    document
+      .getElementById(
+        "loginEmail"
+      )
+      .value
+      .trim();
+
+
+  const password =
+    document
+      .getElementById(
+        "loginPassword"
+      )
+      .value;
+
+
+  const message =
+    document
+      .getElementById(
+        "loginMessage"
+      );
+
+
+  message.textContent="";
+
+
+  if(!email || !password){
+
+    message.textContent =
+      "請輸入 Email 和密碼";
+
+    return;
+
+  }
+
+
+  const {error} =
+    await sb.auth.signInWithPassword({
+
+      email,
+
+      password
+
+    });
+
+
+  if(error){
+
+    message.textContent =
+      "登入失敗：" +
+      error.message;
+
+    return;
+
+  }
+
+
+  document
+    .getElementById(
+      "loginPassword"
+    )
+    .value="";
+
+
+  hideLogin();
+
+}
+
+
+/* =========================
+   登出
+========================= */
+
+async function logout(){
+
+  await sb.auth.signOut();
+
+  clearForm();
+
+}
+
+
+/* =========================
+   新增 / 修改
+========================= */
+
+async function addStock(){
+
+  if(!currentUser){
+
+    alert(
+      "請先登入管理員帳號"
+    );
+
+    return;
+
+  }
+
+
+  const name =
+    document
+      .getElementById("name")
+      .value
+      .trim();
+
+
+  const symbol =
+    document
+      .getElementById("symbol")
+      .value
+      .trim();
+
+
+  if(!name || !symbol){
+
+    alert(
+      "請至少輸入股票名稱與代號"
+    );
+
+    return;
+
+  }
+
+
+  const payload = {
+
+    name:name,
+
+    symbol:symbol,
+
+    pattern:
+      document
+        .getElementById("pattern")
+        .value,
+
+    key_price:
+      document
+        .getElementById("keyPrice")
+        .value
+        .trim(),
+
+    entry_price:
+      document
+        .getElementById("entryPrice")
+        .value
+        .trim(),
+
+    stop_price:
+      document
+        .getElementById("stopPrice")
+        .value
+        .trim(),
+
+    status:
+      document
+        .getElementById("status")
+        .value,
+
+    memo:
+      document
+        .getElementById("memo")
+        .value
+        .trim()
+
+  };
+
+
+  let result;
+
+
+  if(editingId){
+
+    result =
+      await sb
+        .from("pocket_stocks")
+        .update(payload)
+        .eq(
+          "id",
+          editingId
+        );
+
+  }
+
+  else{
+
+    result =
+      await sb
+        .from("pocket_stocks")
+        .insert(payload);
+
+  }
+
+
+  if(result.error){
+
+    alert(
+      "儲存失敗：" +
+      result.error.message
+    );
+
+    return;
+
+  }
+
+
+  clearForm();
+
+
+  await loadData();
+
+}
+
+
+/* =========================
+   編輯
+========================= */
+
+function editStock(id){
+
+  if(!currentUser){
+
+    alert(
+      "請先登入管理員帳號"
+    );
+
+    return;
+
+  }
+
+
+  const stock =
+    stocks.find(
+      x =>
+        String(x.id) ===
+        String(id)
+    );
+
+
+  if(!stock){
+    return;
+  }
+
+
+  editingId =
+    stock.id;
+
+
+  document
+    .getElementById("name")
+    .value =
+      stock.name || "";
+
+
+  document
+    .getElementById("symbol")
+    .value =
+      stock.symbol || "";
+
+
+  document
+    .getElementById("pattern")
+    .value =
+      stock.pattern || "";
+
+
+  document
+    .getElementById("keyPrice")
+    .value =
+      stock.key_price || "";
+
+
+  document
+    .getElementById("entryPrice")
+    .value =
+      stock.entry_price || "";
+
+
+  document
+    .getElementById("stopPrice")
+    .value =
+      stock.stop_price || "";
+
+
+  document
+    .getElementById("status")
+    .value =
+      stock.status ||
+      "watching";
+
+
+  document
+    .getElementById("memo")
+    .value =
+      stock.memo || "";
+
+
+  document
+    .querySelector(
+      "#adminPanel"
+    )
+    .scrollIntoView({
+      behavior:"smooth"
+    });
+
+
+  document
+    .querySelector(
+      "#adminPanel h2"
+    )
+    .textContent =
+      "修改口袋標的";
+
+}
+
+
+/* =========================
+   刪除
+========================= */
+
+async function deleteStock(id){
+
+  if(!currentUser){
+
+    alert(
+      "請先登入管理員帳號"
+    );
+
+    return;
+
+  }
+
+
+  if(
+    !confirm(
+      "確定要刪除這個標的嗎？"
+    )
+  ){
+
+    return;
+
+  }
+
+
+  const {error} =
+    await sb
+      .from("pocket_stocks")
+      .delete()
+      .eq("id",id);
+
+
+  if(error){
+
+    alert(
+      "刪除失敗：" +
+      error.message
+    );
+
+    return;
+
+  }
+
+
+  await loadData();
+
+}
+
+
+/* =========================
+   清除表單
+========================= */
+
+function clearForm(){
+
+  editingId=null;
+
+
+  document
+    .getElementById("name")
+    .value="";
+
+
+  document
+    .getElementById("symbol")
+    .value="";
+
+
+  document
+    .getElementById("pattern")
+    .value="";
+
+
+  document
+    .getElementById("keyPrice")
+    .value="";
+
+
+  document
+    .getElementById("entryPrice")
+    .value="";
+
+
+  document
+    .getElementById("stopPrice")
+    .value="";
+
+
+  document
+    .getElementById("status")
+    .value="watching";
+
+
+  document
+    .getElementById("memo")
+    .value="";
+
+
+  const title =
+    document.querySelector(
+      "#adminPanel h2"
+    );
+
+
+  if(title){
+
+    title.textContent =
+      "新增口袋標的";
+
+  }
+
+}
+
+
+/* =========================
+   顯示股票列表
+========================= */
+
+function render(){
+
+  const list =
+    document.getElementById(
+      "list"
+    );
+
+
+  const search =
+    document
+      .getElementById("search")
+      .value
+      .trim()
+      .toLowerCase();
+
+
+  const filter =
+    document
+      .getElementById(
+        "filterStatus"
+      )
+      .value;
+
+
+  let result =
+    stocks.filter(
+      stock=>{
+
+        const text =
+          `${stock.name || ""} ${stock.symbol || ""}`
+            .toLowerCase();
+
+
+        const matchSearch =
+          !search ||
+          text.includes(search);
+
+
+        const matchStatus =
+          !filter ||
+          stock.status === filter;
+
+
+        return (
+          matchSearch &&
+          matchStatus
+        );
+
+      }
+    );
+
+
+  document
+    .getElementById("count")
+    .textContent =
+      `（${result.length} 檔）`;
+
+
+  if(result.length===0){
+
+    list.innerHTML =
+
+      `<div class="card small">
+        目前沒有符合條件的標的。
+      </div>`;
+
+    return;
+
+  }
+
+
+  list.innerHTML =
+
+    result.map(
+      (stock,index)=>{
+
+        const statusText = {
+
+          watching:"觀察",
+
+          ready:"準備進場",
+
+          holding:"持有",
+
+          closed:"已結束"
+
+        }[
+          stock.status
+        ]
+        ||
+        stock.status
+        ||
+        "";
+
+
+        const adminButtons =
+          currentUser
+          ?
+
+          `
+
+          <div class="actions">
+
+            <button
+              class="gray"
+              onclick="editStock(${Number(stock.id)})"
+            >
+              ✏️ 編輯
+            </button>
+
+
+            <button
+              class="red"
+              onclick="deleteStock(${Number(stock.id)})"
+            >
+              🗑️ 刪除
+            </button>
+
+          </div>
+
+          `
+
+          : "";
+
+
+        const yahoo =
+          yahooUrl(
+            stock.symbol
+          );
+
+
+        return `
+
+        <div
+          class="card"
+          style="animation-delay:${index * 0.05}s"
+        >
+
+          <div class="row">
+
+
+            <div class="stock-title">
+
+
+              ${
+                yahoo !== "#"
+
+                ?
+
+                `
+
+                <a
+                  class="stock-link"
+                  href="${yahoo}"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title="前往 Yahoo 股市"
+                >
+
+                  ${escapeHtml(
+                    stock.name || ""
+                  )}
+
+                  <span class="stock-code">
+
+                    ${escapeHtml(
+                      stock.symbol || ""
+                    )}
+
+                  </span>
+
+                  <span class="yahoo-icon">
+                    ↗
+                  </span>
+
+                </a>
+
+                `
+
+                :
+
+                `
+
+                ${escapeHtml(
+                  stock.name || ""
+                )}
+
+                <span class="stock-code">
+
+                  ${escapeHtml(
+                    stock.symbol || ""
+                  )}
+
+                </span>
+
+                `
+
+              }
+
+
+            </div>
+
+
+            <span class="status">
+
+              ${escapeHtml(
+                statusText
+              )}
+
+            </span>
+
+
+          </div>
+
+
+          <div class="meta">
+
+
+            ${
+              stock.pattern
+
+              ?
+
+              `型態：
+              ${escapeHtml(
+                stock.pattern
+              )}<br>`
+
+              :
+
+              ""
+            }
+
+
+            ${
+              stock.key_price
+
+              ?
+
+              `關鍵價：
+              ${escapeHtml(
+                stock.key_price
+              )}<br>`
+
+              :
+
+              ""
+            }
+
+
+            ${
+              stock.entry_price
+
+              ?
+
+              `進場：
+              ${escapeHtml(
+                stock.entry_price
+              )}<br>`
+
+              :
+
+              ""
+            }
+
+
+            ${
+              stock.stop_price
+
+              ?
+
+              `停損：
+              ${escapeHtml(
+                stock.stop_price
+              )}<br>`
+
+              :
+
+              ""
+            }
+
+
+            ${
+              stock.memo
+
+              ?
+
+              `備註：
+              ${escapeHtml(
+                stock.memo
+              )}`
+
+              :
+
+              ""
+            }
+
+
+          </div>
+
+
+          ${adminButtons}
+
+
+        </div>
+
+        `;
+
+      }
+
+    ).join("");
+
+}
+
+
+/* =========================
+   HTML 安全處理
+========================= */
+
+function escapeHtml(value){
+
+  return String(
+    value ?? ""
+  )
+
+    .replace(
+      /&/g,
+      "&amp;"
+    )
+
+    .replace(
+      /</g,
+      "&lt;"
+    )
+
+    .replace(
+      />/g,
+      "&gt;"
+    )
+
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+
+    .replace(
+      /'/g,
+      "&#039;"
+    );
+
+}
+
+
+/* =========================
+   啟動網站
+========================= */
+
+init();
+
+</script>
+
+</body>
+</html>
