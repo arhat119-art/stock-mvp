@@ -4,66 +4,469 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>台股狩獵場 v2</title>
+
 <style>
 body{margin:0;background:#f4f5f7;font-family:system-ui,-apple-system,"Noto Sans TC",sans-serif;color:#222}
-header{background:#111827;color:#fff;padding:18px 16px}h1{margin:0;font-size:24px}.sub{font-size:13px;opacity:.75;margin-top:4px}
-main{max-width:720px;margin:auto;padding:14px}.tools,.filters{display:flex;gap:7px;overflow:auto;margin-bottom:12px}.tools button,.filters button{white-space:nowrap}
-button,input,select,textarea{font:inherit;border:1px solid #d1d5db;border-radius:9px;padding:9px;background:#fff}button{cursor:pointer}.primary{background:#111827;color:#fff}
-.card{background:#fff;border-radius:14px;padding:15px;margin:10px 0;box-shadow:0 2px 8px #0001}.row{display:flex;justify-content:space-between;gap:8px}
-.name{font-weight:700;font-size:19px}.code{color:#777;font-size:13px}.badge{font-size:12px;background:#eef2ff;padding:5px 8px;border-radius:99px;white-space:nowrap}
-.meta{font-size:14px;line-height:1.7;margin-top:9px}.actions{display:flex;gap:7px;margin-top:10px}.actions button{flex:1}
-dialog{border:0;border-radius:16px;width:min(92vw,520px);padding:0}dialog::backdrop{background:#0008}.modal{padding:18px}
-label{display:block;font-size:13px;font-weight:600;margin:9px 0 4px}input,select,textarea{width:100%;box-sizing:border-box}textarea{min-height:80px}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.full{grid-column:1/-1}.save{display:flex;gap:8px;margin-top:15px}.save button{flex:1}
-.note{font-size:12px;color:#666}.empty{text-align:center;color:#777;padding:35px}
+header{background:#111827;color:#fff;padding:18px 16px}
+h1{margin:0;font-size:24px}
+.sub{font-size:13px;opacity:.75;margin-top:4px}
+main{max-width:720px;margin:auto;padding:14px}
+.tools,.filters{display:flex;gap:7px;overflow:auto;margin-bottom:12px}
+.tools button,.filters button{white-space:nowrap}
+button,input,select,textarea{font:inherit;border:1px solid #d1d5db;border-radius:9px;padding:9px;background:#fff}
+button{cursor:pointer}
+.primary{background:#111827;color:#fff}
+.card{background:#fff;border-radius:14px;padding:15px;margin:10px 0;box-shadow:0 2px 8px #0001}
+.row{display:flex;justify-content:space-between;gap:8px}
+.name{font-weight:700;font-size:19px}
+.code{color:#777;font-size:13px}
+.badge{font-size:12px;background:#eef2ff;padding:5px 8px;border-radius:99px;white-space:nowrap}
+.meta{font-size:14px;line-height:1.7;margin-top:9px}
+.actions{display:flex;gap:7px;margin-top:10px}
+.actions button{flex:1}
+dialog{border:0;border-radius:16px;width:min(92vw,520px);padding:0}
+dialog::backdrop{background:#0008}
+.modal{padding:18px}
+label{display:block;font-size:13px;font-weight:600;margin:9px 0 4px}
+input,select,textarea{width:100%;box-sizing:border-box}
+textarea{min-height:80px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.full{grid-column:1/-1}
+.save{display:flex;gap:8px;margin-top:15px}
+.save button{flex:1}
+.note{font-size:12px;color:#666}
+.empty{text-align:center;color:#777;padding:35px}
+.loading{text-align:center;color:#777;padding:35px}
 </style>
 </head>
+
 <body>
-<header><h1>台股狩獵場</h1><div class="sub">v2｜記錄第一直覺 → 後續驗證 → 修改</div></header>
+
+<header>
+<h1>台股狩獵場</h1>
+<div class="sub">v2｜記錄第一直覺 → 後續驗證 → 修改</div>
+</header>
+
 <main>
-<div class="tools"><button class="primary" onclick="newStock()">＋ 新增標的</button><button onclick="exportData()">匯出紀錄</button></div>
-<div class="filters" id="filters"></div><div id="list"></div>
-</main>
-<dialog id="dlg"><div class="modal">
-<h2 id="title">新增標的</h2><div class="note">先記下當下第一直覺，之後再回來驗證。</div>
-<input type="hidden" id="id">
-<div class="grid">
-<div><label>股票名稱</label><input id="name" placeholder="例如 正崴"></div>
-<div><label>股票代號</label><input id="code" placeholder="例如 2392"></div>
-<div class="full"><label>型態</label><select id="pattern"><option>週K破底翻</option><option>突破 → 回測不破</option><option>日K破底翻</option><option>其他觀察</option></select></div>
-<div><label>關鍵價格</label><input id="key" inputmode="decimal"></div>
-<div><label>試單價格</label><input id="entry" inputmode="decimal"></div>
-<div><label>停損價格</label><input id="stop" inputmode="decimal"></div>
-<div><label>狀態</label><select id="status"><option>第一直覺</option><option>接近試單</option><option>等待回測</option><option>已持有</option><option>暫不考慮</option><option>已驗證</option></select></div>
-<div class="full"><label>第一直覺／備註</label><textarea id="memo" placeholder="例如：32附近守住願意試單……"></textarea></div>
+
+<div class="tools">
+<button class="primary" onclick="newStock()">＋ 新增標的</button>
+<button onclick="exportData()">匯出紀錄</button>
 </div>
-<div class="save"><button onclick="dlg.close()">取消</button><button class="primary" onclick="save()">儲存</button></div>
-</div></dialog>
+
+<div class="filters" id="filters"></div>
+<div id="list"><div class="loading">正在連接雲端資料庫…</div></div>
+
+</main>
+
+<dialog id="dlg">
+<div class="modal">
+
+<h2 id="title">新增標的</h2>
+
+<div class="note">
+先記下當下第一直覺，之後再回來驗證。
+</div>
+
+<input type="hidden" id="id">
+
+<div class="grid">
+
+<div>
+<label>股票名稱</label>
+<input id="name" placeholder="例如 正崴">
+</div>
+
+<div>
+<label>股票代號</label>
+<input id="code" placeholder="例如 2392">
+</div>
+
+<div class="full">
+<label>型態</label>
+<select id="pattern">
+<option>週K破底翻</option>
+<option>突破 → 回測不破</option>
+<option>日K破底翻</option>
+<option>其他觀察</option>
+</select>
+</div>
+
+<div>
+<label>關鍵價格</label>
+<input id="key" inputmode="decimal">
+</div>
+
+<div>
+<label>試單價格</label>
+<input id="entry" inputmode="decimal">
+</div>
+
+<div>
+<label>停損價格</label>
+<input id="stop" inputmode="decimal">
+</div>
+
+<div>
+<label>狀態</label>
+<select id="status">
+<option>第一直覺</option>
+<option>接近試單</option>
+<option>等待回測</option>
+<option>已持有</option>
+<option>暫不考慮</option>
+<option>已驗證</option>
+</select>
+</div>
+
+<div class="full">
+<label>第一直覺／備註</label>
+<textarea id="memo" placeholder="例如：32附近守住願意試單……"></textarea>
+</div>
+
+</div>
+
+<div class="save">
+<button onclick="dlg.close()">取消</button>
+<button class="primary" onclick="save()">儲存</button>
+</div>
+
+</div>
+</dialog>
+
+<!-- Supabase -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script>
-const STORE="stock_hunting_v2";
-const initial=[
-{name:"正崴",code:"2392",pattern:"突破 → 回測不破",key:"",entry:"",stop:"",status:"接近試單",memo:"第一版範例"},
-{name:"華榮",code:"1608",pattern:"週K破底翻",key:"32",entry:"",stop:"",status:"等待回測",memo:"等32附近觀察是否守住"},
-{name:"新鉅科",code:"3630",pattern:"週K破底翻",key:"",entry:"",stop:"",status:"暫不考慮",memo:"近期漲幅較大"},
-{name:"鑽石投資",code:"6901",pattern:"週K破底翻",key:"",entry:"",stop:"",status:"已持有",memo:"持續觀察"}
-].map(x=>({...x,id:crypto.randomUUID()}));
-let data=JSON.parse(localStorage.getItem(STORE)||"null")||initial, current="全部";
-const $=id=>document.getElementById(id), esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-function saveStore(){localStorage.setItem(STORE,JSON.stringify(data))}
-function render(){
- let sts=["全部","第一直覺","接近試單","等待回測","已持有","暫不考慮","已驗證"];
- $("filters").innerHTML=sts.map(s=>`<button onclick="current='${s}';render()">${s}</button>`).join("");
- let a=current==="全部"?data:data.filter(x=>x.status===current);
- $("list").innerHTML=a.length?a.map(x=>`<div class="card"><div class="row"><div><span class="name">${esc(x.name)}</span> <span class="code">${esc(x.code)}</span></div><span class="badge">${esc(x.status)}</span></div>
- <div class="meta"><b>型態：</b>${esc(x.pattern)}<br><b>關鍵價格：</b>${esc(x.key||"待確認")}${x.entry?`<br><b>試單價格：</b>${esc(x.entry)}`:""}${x.stop?`<br><b>停損價格：</b>${esc(x.stop)}`:""}${x.memo?`<br><b>紀錄：</b>${esc(x.memo)}`:""}</div>
- <div class="actions"><button onclick="edit('${x.id}')">✏️ 編輯</button><button onclick="removeStock('${x.id}')">🗑️ 刪除</button></div></div>`).join(""):'<div class="empty">目前沒有符合條件的標的</div>';
+
+const SUPABASE_URL =
+"https://dfzmpdllwggmowqxmfnm.supabase.co";
+
+const SUPABASE_KEY =
+"sb_publishable_MlI3Rkr5IbhQVmhUZV8Z6g_mNQ3r0fR";
+
+const sb = window.supabase.createClient(
+SUPABASE_URL,
+SUPABASE_KEY
+);
+
+let data = [];
+let current = "全部";
+
+const $ = id => document.getElementById(id);
+
+const esc = s =>
+String(s ?? "").replace(/[&<>"']/g,c=>({
+"&":"&amp;",
+"<":"&lt;",
+">":"&gt;",
+'"':"&quot;",
+"'":"&#39;"
+}[c]));
+
+function view(x){
+return {
+id:x.id,
+name:x.name || "",
+code:x.symbol || "",
+pattern:x.pattern || "週K破底翻",
+key:x.key_price || "",
+entry:x.entry_price || "",
+stop:x.stop_price || "",
+status:x.status || "第一直覺",
+memo:x.memo || ""
+};
 }
-function newStock(){fill({});$("title").textContent="新增標的";$("dlg").showModal()}
-function fill(x){["id","name","code","key","entry","stop","memo"].forEach(k=>$(k).value=x[k]||"");$("pattern").value=x.pattern||"週K破底翻";$("status").value=x.status||"第一直覺"}
-function edit(id){let x=data.find(x=>x.id===id);fill(x);$("title").textContent="修改標的";$("dlg").showModal()}
-function save(){let id=$("id").value;let x={id:id||crypto.randomUUID(),name:$("name").value.trim(),code:$("code").value.trim(),pattern:$("pattern").value,key:$("key").value.trim(),entry:$("entry").value.trim(),stop:$("stop").value.trim(),status:$("status").value,memo:$("memo").value.trim()};if(!x.name){alert("請輸入股票名稱");return}data=id?data.map(y=>y.id===id?x:y):[x,...data];saveStore();$("dlg").close();render()}
-function removeStock(id){let x=data.find(x=>x.id===id);if(confirm("確定刪除 "+x.name+"？")){data=data.filter(x=>x.id!==id);saveStore();render()}}
-function exportData(){let b=new Blob([JSON.stringify(data,null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="台股狩獵場-紀錄.json";a.click()}
+
+async function loadData(){
+
+const {data:rows,error} =
+await sb
+.from("pocket_stocks")
+.select("*")
+.order("created_at",{ascending:false});
+
+if(error){
+
+console.error(error);
+
+$("list").innerHTML =
+'<div class="empty">雲端資料讀取失敗<br><br>'+
+esc(error.message)+
+'</div>';
+
+return;
+}
+
+data = rows || [];
+
 render();
+
+}
+
+function render(){
+
+let sts=[
+"全部",
+"第一直覺",
+"接近試單",
+"等待回測",
+"已持有",
+"暫不考慮",
+"已驗證"
+];
+
+$("filters").innerHTML =
+sts.map(s =>
+`<button onclick="current='${s}';render()">${s}</button>`
+).join("");
+
+let a =
+current==="全部"
+?data
+:data.filter(x=>view(x).status===current);
+
+$("list").innerHTML =
+a.length
+?a.map(x=>{
+
+let v=view(x);
+
+return `
+<div class="card">
+
+<div class="row">
+
+<div>
+<span class="name">${esc(v.name)}</span>
+<span class="code">${esc(v.code)}</span>
+</div>
+
+<span class="badge">${esc(v.status)}</span>
+
+</div>
+
+<div class="meta">
+
+<b>型態：</b>${esc(v.pattern)}
+
+<br>
+
+<b>關鍵價格：</b>${esc(v.key||"待確認")}
+
+${v.entry
+?`<br><b>試單價格：</b>${esc(v.entry)}`
+:""}
+
+${v.stop
+?`<br><b>停損價格：</b>${esc(v.stop)}`
+:""}
+
+${v.memo
+?`<br><b>紀錄：</b>${esc(v.memo)}`
+:""}
+
+</div>
+
+<div class="actions">
+
+<button onclick="edit('${x.id}')">
+✏️ 編輯
+</button>
+
+<button onclick="removeStock('${x.id}')">
+🗑️ 刪除
+</button>
+
+</div>
+
+</div>
+`;
+
+}).join("")
+:'<div class="empty">目前沒有符合條件的標的</div>';
+
+}
+
+function newStock(){
+
+fill({});
+
+$("title").textContent="新增標的";
+
+$("dlg").showModal();
+
+}
+
+function fill(x){
+
+$("id").value=x.id||"";
+$("name").value=x.name||"";
+$("code").value=x.code||"";
+$("key").value=x.key||"";
+$("entry").value=x.entry||"";
+$("stop").value=x.stop||"";
+$("memo").value=x.memo||"";
+
+$("pattern").value=x.pattern||"週K破底翻";
+$("status").value=x.status||"第一直覺";
+
+}
+
+function edit(id){
+
+let x=data.find(x=>String(x.id)===String(id));
+
+if(!x)return;
+
+fill(view(x));
+
+$("title").textContent="修改標的";
+
+$("dlg").showModal();
+
+}
+
+async function save(){
+
+let id=$("id").value;
+
+let name=$("name").value.trim();
+
+if(!name){
+
+alert("請輸入股票名稱");
+
+return;
+
+}
+
+let row={
+
+name:name,
+
+symbol:$("code").value.trim(),
+
+pattern:$("pattern").value,
+
+key_price:$("key").value.trim(),
+
+entry_price:$("entry").value.trim(),
+
+stop_price:$("stop").value.trim(),
+
+status:$("status").value,
+
+memo:$("memo").value.trim()
+
+};
+
+let result;
+
+if(id){
+
+result=await sb
+.from("pocket_stocks")
+.update(row)
+.eq("id",Number(id))
+.select()
+.single();
+
+}else{
+
+result=await sb
+.from("pocket_stocks")
+.insert(row)
+.select()
+.single();
+
+}
+
+if(result.error){
+
+alert("儲存失敗："+result.error.message);
+
+console.error(result.error);
+
+return;
+
+}
+
+if(id){
+
+data=data.map(x=>
+String(x.id)===String(id)
+?result.data
+:x
+);
+
+}else{
+
+data=[result.data,...data];
+
+}
+
+$("dlg").close();
+
+render();
+
+}
+
+async function removeStock(id){
+
+let x=data.find(x=>String(x.id)===String(id));
+
+if(!x)return;
+
+let v=view(x);
+
+if(!confirm("確定刪除 "+v.name+"？"))return;
+
+const {error}=await sb
+.from("pocket_stocks")
+.delete()
+.eq("id",Number(id));
+
+if(error){
+
+alert("刪除失敗："+error.message);
+
+console.error(error);
+
+return;
+
+}
+
+data=data.filter(x=>
+String(x.id)!==String(id)
+);
+
+render();
+
+}
+
+function exportData(){
+
+let rows=data.map(view);
+
+let b=new Blob(
+[JSON.stringify(rows,null,2)],
+{type:"application/json"}
+);
+
+let a=document.createElement("a");
+
+a.href=URL.createObjectURL(b);
+
+a.download="台股狩獵場-紀錄.json";
+
+a.click();
+
+}
+
+loadData();
+
 </script>
-</body></html>
+
+</body>
+</html>
