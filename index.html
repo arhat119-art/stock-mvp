@@ -3,798 +3,778 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#111827">
+
 <title>台股狩獵場 v2</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
+
+/* =========================
+   基本
+========================= */
+
+*{
+  box-sizing:border-box;
+}
+
 body{
   margin:0;
   background:#f4f5f7;
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans TC",sans-serif;
   color:#222;
+  opacity:0;
+  animation:pageIn .45s ease forwards;
 }
+
+@keyframes pageIn{
+  from{
+    opacity:0;
+  }
+  to{
+    opacity:1;
+  }
+}
+
+
+/* =========================
+   Loading 畫面
+========================= */
+
+#loadingScreen{
+  position:fixed;
+  inset:0;
+  z-index:99999;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  background:
+    radial-gradient(
+      circle at 50% 40%,
+      #1e293b 0%,
+      #111827 45%,
+      #020617 100%
+    );
+
+  color:#fff;
+
+  overflow:hidden;
+
+  transition:
+    opacity .45s ease,
+    visibility .45s ease;
+}
+
+#loadingScreen.hide{
+  opacity:0;
+  visibility:hidden;
+}
+
+.loading-glow{
+  position:absolute;
+
+  width:280px;
+  height:280px;
+
+  border-radius:50%;
+
+  background:rgba(96,165,250,.13);
+
+  filter:blur(65px);
+
+  animation:
+    glowMove 3s ease-in-out infinite alternate;
+}
+
+.loading-content{
+  position:relative;
+  text-align:center;
+}
+
+.loading-logo{
+  font-size:30px;
+  font-weight:800;
+  letter-spacing:2px;
+}
+
+.loading-version{
+  margin-top:5px;
+  color:#94a3b8;
+  font-size:13px;
+}
+
+.loader{
+  width:32px;
+  height:32px;
+
+  margin:28px auto 16px;
+
+  border:3px solid rgba(255,255,255,.18);
+  border-top-color:#fff;
+
+  border-radius:50%;
+
+  animation:spin .8s linear infinite;
+}
+
+.loading-text{
+  font-size:13px;
+  color:#94a3b8;
+}
+
+@keyframes spin{
+  to{
+    transform:rotate(360deg);
+  }
+}
+
+@keyframes glowMove{
+
+  from{
+    transform:
+      translate(-35px,-15px)
+      scale(.9);
+  }
+
+  to{
+    transform:
+      translate(35px,20px)
+      scale(1.12);
+  }
+}
+
+
+/* =========================
+   Header
+========================= */
+
 header{
   background:#111827;
   color:#fff;
-  padding:18px 16px;
+
+  padding:
+    18px
+    16px;
+
+  box-shadow:
+    0 3px 14px rgba(0,0,0,.12);
 }
-h1{margin:0;font-size:24px}
-.sub{font-size:13px;opacity:.75;margin-top:4px}
+
+h1{
+  margin:0;
+  font-size:24px;
+}
+
+.sub{
+  font-size:13px;
+  opacity:.75;
+  margin-top:4px;
+}
+
+
+/* =========================
+   主要區域
+========================= */
+
 main{
   max-width:720px;
   margin:auto;
   padding:14px;
 }
+
+
+/* =========================
+   卡片
+========================= */
+
 .card{
   background:#fff;
-  border-radius:14px;
+
+  border-radius:16px;
+
   padding:14px;
+
   margin-bottom:12px;
-  box-shadow:0 2px 8px rgba(0,0,0,.06);
+
+  box-shadow:
+    0 2px 8px rgba(0,0,0,.06);
+
+  animation:
+    cardIn .42s ease both;
 }
-button,input,select,textarea{
+
+@keyframes cardIn{
+
+  from{
+    opacity:0;
+    transform:
+      translateY(14px);
+  }
+
+  to{
+    opacity:1;
+    transform:
+      translateY(0);
+  }
+}
+
+
+/* =========================
+   按鈕 / 輸入
+========================= */
+
+button,
+input,
+select,
+textarea{
   font:inherit;
   box-sizing:border-box;
 }
+
 button{
   border:0;
   border-radius:9px;
   padding:9px 13px;
   cursor:pointer;
+
+  transition:
+    transform .12s ease,
+    opacity .12s ease,
+    box-shadow .12s ease;
 }
+
+button:active{
+  transform:scale(.96);
+}
+
+button:hover{
+  opacity:.9;
+}
+
 .primary{
   background:#111827;
   color:#fff;
 }
+
 .green{
   background:#16803c;
   color:#fff;
 }
+
 .red{
   background:#c62828;
   color:#fff;
 }
+
 .gray{
   background:#e5e7eb;
+  color:#222;
 }
-input,select,textarea{
+
+input,
+select,
+textarea{
   width:100%;
+
   padding:10px;
+
   border:1px solid #d1d5db;
-  border-radius:8px;
+
+  border-radius:9px;
+
   background:#fff;
+
+  outline:none;
+
+  transition:
+    border-color .15s ease,
+    box-shadow .15s ease;
 }
-textarea{min-height:80px;resize:vertical}
+
+input:focus,
+select:focus,
+textarea:focus{
+
+  border-color:#64748b;
+
+  box-shadow:
+    0 0 0 3px rgba(100,116,139,.12);
+}
+
+textarea{
+  min-height:80px;
+  resize:vertical;
+}
+
+
+/* =========================
+   表單
+========================= */
+
 .form-grid{
+
   display:grid;
-  grid-template-columns:1fr 1fr;
+
+  grid-template-columns:
+    1fr 1fr;
+
   gap:9px;
 }
+
 .form-grid .full{
   grid-column:1/-1;
 }
+
 .tools{
   display:flex;
+
   gap:8px;
+
   flex-wrap:wrap;
+
   margin-bottom:12px;
 }
+
+
+/* =========================
+   狀態
+========================= */
+
 .status{
+
   padding:4px 8px;
+
   border-radius:20px;
+
   background:#eef2ff;
+
   font-size:12px;
+
+  white-space:nowrap;
 }
+
+
+/* =========================
+   股票名稱
+========================= */
+
 .stock-title{
+
   font-size:18px;
+
   font-weight:700;
 }
-.stock-code{
-  color:#666;
-  margin-left:5px;
+
+
+/* Yahoo 股票連結 */
+
+.stock-link{
+
+  display:inline-flex;
+
+  align-items:center;
+
+  gap:5px;
+
+  color:inherit;
+
+  text-decoration:none;
+
+  transition:
+    transform .15s ease,
+    opacity .15s ease;
 }
+
+.stock-link:hover{
+  opacity:.7;
+}
+
+.stock-link:active{
+  transform:scale(.97);
+}
+
+.stock-code{
+
+  color:#666;
+
+  font-size:14px;
+
+  font-weight:500;
+}
+
+.yahoo-icon{
+
+  font-size:12px;
+
+  color:#64748b;
+
+  opacity:.8;
+}
+
+
+/* =========================
+   排版
+========================= */
+
 .row{
+
   display:flex;
+
   justify-content:space-between;
+
   gap:10px;
+
   align-items:center;
 }
+
 .meta{
+
   color:#555;
+
   font-size:14px;
+
   line-height:1.7;
+
   margin-top:8px;
 }
+
 .actions{
+
   display:flex;
+
   gap:6px;
+
   margin-top:10px;
 }
-.hidden{display:none}
+
+.hidden{
+  display:none;
+}
+
 #loginBox{
+
   max-width:420px;
+
   margin:30px auto;
 }
+
 .small{
+
   font-size:13px;
+
   color:#666;
 }
+
 .message{
+
   margin-top:8px;
+
   color:#c62828;
+
   font-size:14px;
 }
+
+
+/* =========================
+   搜尋區
+========================= */
+
+#search{
+
+  flex:1;
+  min-width:180px;
+}
+
+#filterStatus{
+
+  min-width:130px;
+}
+
+
+/* =========================
+   手機版
+========================= */
+
+@media(max-width:520px){
+
+  header{
+    padding:
+      17px
+      14px;
+  }
+
+  h1{
+    font-size:23px;
+  }
+
+  main{
+    padding:12px;
+  }
+
+  .form-grid{
+    grid-template-columns:1fr;
+  }
+
+  .form-grid .full{
+    grid-column:auto;
+  }
+
+  .row{
+    align-items:flex-start;
+  }
+
+  header .row{
+    align-items:center;
+  }
+
+  header button{
+    padding:9px 11px;
+  }
+
+  .tools{
+    width:100%;
+  }
+
+  #search{
+    width:100%;
+    flex:1 1 100%;
+  }
+
+  #filterStatus{
+    width:100%;
+  }
+}
+
 </style>
 </head>
 
+
 <body>
 
-<header>
-  <div class="row">
-    <div>
-      <h1>台股狩獵場 v2</h1>
-      <div class="sub">我的週K口袋名單</div>
+
+<!-- =========================
+     Loading
+========================= -->
+
+<div id="loadingScreen">
+
+  <div class="loading-glow"></div>
+
+  <div class="loading-content">
+
+    <div class="loading-logo">
+      台股狩獵場
     </div>
 
-    <div>
-      <button id="loginBtn" class="gray" onclick="showLogin()">管理員登入</button>
-      <button id="logoutBtn" class="gray hidden" onclick="logout()">登出</button>
+    <div class="loading-version">
+      v2
     </div>
+
+    <div class="loader"></div>
+
+    <div class="loading-text">
+      正在載入口袋名單…
+    </div>
+
   </div>
+
+</div>
+
+
+
+<header>
+
+  <div class="row">
+
+    <div>
+
+      <h1>
+        台股狩獵場 v2
+      </h1>
+
+      <div class="sub">
+        我的週K口袋名單
+      </div>
+
+    </div>
+
+
+    <div>
+
+      <button
+        id="loginBtn"
+        class="gray"
+        onclick="showLogin()"
+      >
+        管理員登入
+      </button>
+
+
+      <button
+        id="logoutBtn"
+        class="gray hidden"
+        onclick="logout()"
+      >
+        登出
+      </button>
+
+    </div>
+
+  </div>
+
 </header>
+
+
 
 <main>
 
-  <!-- 登入區 -->
-  <div id="loginBox" class="card hidden">
-    <h2>管理員登入</h2>
 
-    <div style="margin-bottom:10px">
-      <label>Email</label>
-      <input id="loginEmail" type="email" placeholder="你的 Email">
-    </div>
+<!-- =========================
+     登入區
+========================= -->
 
-    <div style="margin-bottom:10px">
-      <label>密碼</label>
-      <input id="loginPassword" type="password" placeholder="你的密碼">
-    </div>
+<div
+  id="loginBox"
+  class="card hidden"
+>
 
-    <div class="tools">
-      <button class="primary" onclick="login()">登入</button>
-      <button class="gray" onclick="hideLogin()">取消</button>
-    </div>
-
-    <div id="loginMessage" class="message"></div>
-  </div>
+  <h2>
+    管理員登入
+  </h2>
 
 
-  <!-- 管理員新增區 -->
-  <div id="adminPanel" class="card hidden">
+  <div style="margin-bottom:10px">
 
-    <div class="row">
-      <h2 style="margin:0">新增口袋標的</h2>
-      <span class="status">管理員模式</span>
-    </div>
+    <label>
+      Email
+    </label>
 
-    <div class="form-grid" style="margin-top:12px">
-
-      <div>
-        <label>股票名稱</label>
-        <input id="name" placeholder="例如：正崴">
-      </div>
-
-      <div>
-        <label>股票代號</label>
-        <input id="symbol" placeholder="例如：2392">
-      </div>
-
-      <div>
-        <label>型態</label>
-        <select id="pattern">
-          <option value="">請選擇</option>
-          <option>破底翻</option>
-          <option>突破回測不破</option>
-          <option>日K破底翻</option>
-          <option>其他</option>
-        </select>
-      </div>
-
-      <div>
-        <label>關鍵價</label>
-        <input id="keyPrice" placeholder="例如：32">
-      </div>
-
-      <div>
-        <label>預計進場</label>
-        <input id="entryPrice" placeholder="例如：33">
-      </div>
-
-      <div>
-        <label>停損</label>
-        <input id="stopPrice" placeholder="例如：29">
-      </div>
-
-      <div>
-        <label>狀態</label>
-        <select id="status">
-          <option value="watching">觀察</option>
-          <option value="ready">準備進場</option>
-          <option value="holding">持有</option>
-          <option value="closed">已結束</option>
-        </select>
-      </div>
-
-      <div class="full">
-        <label>備註</label>
-        <textarea id="memo" placeholder="記錄當下第一直覺、型態理由、後續觀察..."></textarea>
-      </div>
-
-    </div>
-
-    <div class="tools" style="margin-top:12px">
-      <button class="green" onclick="addStock()">＋新增標的</button>
-      <button class="gray" onclick="clearForm()">清除</button>
-    </div>
+    <input
+      id="loginEmail"
+      type="email"
+      placeholder="你的 Email"
+    >
 
   </div>
 
 
-  <!-- 搜尋區 -->
-  <div class="card">
+  <div style="margin-bottom:10px">
 
-    <div class="tools">
-      <input id="search" placeholder="搜尋股票名稱或代號" oninput="render()">
+    <label>
+      密碼
+    </label>
 
-      <select id="filterStatus" onchange="render()">
-        <option value="">全部狀態</option>
-        <option value="watching">觀察</option>
-        <option value="ready">準備進場</option>
-        <option value="holding">持有</option>
-        <option value="closed">已結束</option>
-      </select>
-    </div>
-
-    <div class="row">
-      <div>
-        <strong>口袋名單</strong>
-        <span id="count" class="small"></span>
-      </div>
-
-      <span id="userStatus" class="small">目前為訪客模式</span>
-    </div>
+    <input
+      id="loginPassword"
+      type="password"
+      placeholder="你的密碼"
+    >
 
   </div>
 
 
-  <!-- 股票列表 -->
-  <div id="list"></div>
+  <div class="tools">
 
-</main>
+    <button
+      class="primary"
+      onclick="login()"
+    >
+      登入
+    </button>
 
 
-<script>
+    <button
+      class="gray"
+      onclick="hideLogin()"
+    >
+      取消
+    </button>
 
-const SUPABASE_URL =
-"https://dfzmpdllwggmowqxmfnm.supabase.co";
+  </div>
 
-const SUPABASE_KEY =
-"sb_publishable_MlI3Rkr5IbhQVmhUZV8Z6g_mNQ3r0fR";
 
-const sb = window.supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_KEY
-);
+  <div
+    id="loginMessage"
+    class="message"
+  ></div>
 
-let stocks = [];
-let currentUser = null;
-let editingId = null;
+</div>
 
 
-/* -------------------------
-   初始化
-------------------------- */
 
-async function init(){
+<!-- =========================
+     管理員新增區
+========================= -->
 
-  const {data} = await sb.auth.getSession();
+<div
+  id="adminPanel"
+  class="card hidden"
+>
 
-  currentUser = data.session
-    ? data.session.user
-    : null;
+  <div class="row">
 
-  updateAuthUI();
+    <h2 style="margin:0">
+      新增口袋標的
+    </h2>
 
-  await loadData();
+    <span class="status">
+      管理員模式
+    </span>
 
-  sb.auth.onAuthStateChange((_event,session)=>{
-    currentUser = session ? session.user : null;
-    updateAuthUI();
-  });
-}
+  </div>
 
 
-/* -------------------------
-   載入資料
-------------------------- */
+  <div
+    class="form-grid"
+    style="margin-top:12px"
+  >
 
-async function loadData(){
 
-  const {data,error} = await sb
-    .from("pocket_stocks")
-    .select("*")
-    .order("created_at",{ascending:false});
+    <div>
 
-  if(error){
-    console.error(error);
-    document.getElementById("list").innerHTML =
-      `<div class="card">讀取資料失敗：${escapeHtml(error.message)}</div>`;
-    return;
-  }
+      <label>
+        股票名稱
+      </label>
 
-  stocks = data || [];
+      <input
+        id="name"
+        placeholder="例如：正崴"
+      >
 
-  render();
-}
+    </div>
 
 
-/* -------------------------
-   登入 UI
-------------------------- */
+    <div>
 
-function updateAuthUI(){
+      <label>
+        股票代號
+      </label>
 
-  const adminPanel =
-    document.getElementById("adminPanel");
+      <input
+        id="symbol"
+        placeholder="例如：2392"
+      >
 
-  const loginBtn =
-    document.getElementById("loginBtn");
+    </div>
 
-  const logoutBtn =
-    document.getElementById("logoutBtn");
 
-  const userStatus =
-    document.getElementById("userStatus");
+    <div>
 
-  if(currentUser){
+      <label>
+        型態
+      </label>
 
-    adminPanel.classList.remove("hidden");
-    loginBtn.classList.add("hidden");
-    logoutBtn.classList.remove("hidden");
+      <select id="pattern">
 
-    userStatus.textContent =
-      "🔐 管理員已登入";
+        <option value="">
+          請選擇
+        </option>
 
-  }else{
+        <option>
+          破底翻
+        </option>
 
-    adminPanel.classList.add("hidden");
-    loginBtn.classList.remove("hidden");
-    logoutBtn.classList.add("hidden");
-
-    userStatus.textContent =
-      "目前為訪客模式";
-  }
-
-  render();
-}
-
-
-function showLogin(){
-  document.getElementById("loginBox")
-    .classList.remove("hidden");
-
-  document.getElementById("loginEmail")
-    .focus();
-}
-
-
-function hideLogin(){
-  document.getElementById("loginBox")
-    .classList.add("hidden");
-
-  document.getElementById("loginMessage")
-    .textContent="";
-}
-
-
-/* -------------------------
-   登入
-------------------------- */
-
-async function login(){
-
-  const email =
-    document.getElementById("loginEmail").value.trim();
-
-  const password =
-    document.getElementById("loginPassword").value;
-
-  const message =
-    document.getElementById("loginMessage");
-
-  message.textContent="";
-
-  if(!email || !password){
-
-    message.textContent =
-      "請輸入 Email 和密碼";
-
-    return;
-  }
-
-  const {error} =
-    await sb.auth.signInWithPassword({
-      email,
-      password
-    });
-
-  if(error){
-
-    message.textContent =
-      "登入失敗：" + error.message;
-
-    return;
-  }
-
-  document.getElementById("loginPassword").value="";
-  hideLogin();
-}
-
-
-async function logout(){
-
-  await sb.auth.signOut();
-
-  clearForm();
-}
-
-
-/* -------------------------
-   新增
-------------------------- */
-
-async function addStock(){
-
-  if(!currentUser){
-
-    alert("請先登入管理員帳號");
-    return;
-  }
-
-  const name =
-    document.getElementById("name").value.trim();
-
-  const symbol =
-    document.getElementById("symbol").value.trim();
-
-  if(!name || !symbol){
-
-    alert("請至少輸入股票名稱與代號");
-    return;
-  }
-
-  const payload = {
-
-    name:name,
-    symbol:symbol,
-
-    pattern:
-      document.getElementById("pattern").value,
-
-    key_price:
-      document.getElementById("keyPrice").value.trim(),
-
-    entry_price:
-      document.getElementById("entryPrice").value.trim(),
-
-    stop_price:
-      document.getElementById("stopPrice").value.trim(),
-
-    status:
-      document.getElementById("status").value,
-
-    memo:
-      document.getElementById("memo").value.trim()
-  };
-
-
-  let result;
-
-  if(editingId){
-
-    result =
-      await sb
-      .from("pocket_stocks")
-      .update(payload)
-      .eq("id",editingId);
-
-  }else{
-
-    result =
-      await sb
-      .from("pocket_stocks")
-      .insert(payload);
-  }
-
-
-  if(result.error){
-
-    alert("儲存失敗：" + result.error.message);
-    return;
-  }
-
-  clearForm();
-
-  await loadData();
-}
-
-
-/* -------------------------
-   編輯
-------------------------- */
-
-function editStock(id){
-
-  if(!currentUser){
-    alert("請先登入管理員帳號");
-    return;
-  }
-
-  const stock =
-    stocks.find(x => String(x.id) === String(id));
-
-  if(!stock) return;
-
-  editingId = stock.id;
-
-  document.getElementById("name").value =
-    stock.name || "";
-
-  document.getElementById("symbol").value =
-    stock.symbol || "";
-
-  document.getElementById("pattern").value =
-    stock.pattern || "";
-
-  document.getElementById("keyPrice").value =
-    stock.key_price || "";
-
-  document.getElementById("entryPrice").value =
-    stock.entry_price || "";
-
-  document.getElementById("stopPrice").value =
-    stock.stop_price || "";
-
-  document.getElementById("status").value =
-    stock.status || "watching";
-
-  document.getElementById("memo").value =
-    stock.memo || "";
-
-  document.querySelector("#adminPanel")
-    .scrollIntoView({behavior:"smooth"});
-
-  document.querySelector("#adminPanel h2")
-    .textContent="修改口袋標的";
-}
-
-
-/* -------------------------
-   刪除
-------------------------- */
-
-async function deleteStock(id){
-
-  if(!currentUser){
-
-    alert("請先登入管理員帳號");
-    return;
-  }
-
-  if(!confirm("確定要刪除這個標的嗎？")){
-    return;
-  }
-
-  const {error} =
-    await sb
-    .from("pocket_stocks")
-    .delete()
-    .eq("id",id);
-
-  if(error){
-
-    alert("刪除失敗：" + error.message);
-    return;
-  }
-
-  await loadData();
-}
-
-
-/* -------------------------
-   清除表單
-------------------------- */
-
-function clearForm(){
-
-  editingId=null;
-
-  document.getElementById("name").value="";
-  document.getElementById("symbol").value="";
-  document.getElementById("pattern").value="";
-  document.getElementById("keyPrice").value="";
-  document.getElementById("entryPrice").value="";
-  document.getElementById("stopPrice").value="";
-  document.getElementById("status").value="watching";
-  document.getElementById("memo").value="";
-
-  const title =
-    document.querySelector("#adminPanel h2");
-
-  if(title){
-    title.textContent="新增口袋標的";
-  }
-}
-
-
-/* -------------------------
-   顯示列表
-------------------------- */
-
-function render(){
-
-  const list =
-    document.getElementById("list");
-
-  const search =
-    document.getElementById("search")
-      .value
-      .trim()
-      .toLowerCase();
-
-  const filter =
-    document.getElementById("filterStatus")
-      .value;
-
-
-  let result =
-    stocks.filter(stock=>{
-
-      const text =
-        `${stock.name || ""} ${stock.symbol || ""}`
-        .toLowerCase();
-
-      const matchSearch =
-        !search || text.includes(search);
-
-      const matchStatus =
-        !filter || stock.status === filter;
-
-      return matchSearch && matchStatus;
-    });
-
-
-  document.getElementById("count")
-    .textContent =
-      `（${result.length} 檔）`;
-
-
-  if(result.length===0){
-
-    list.innerHTML =
-      `<div class="card small">目前沒有符合條件的標的。</div>`;
-
-    return;
-  }
-
-
-  list.innerHTML =
-    result.map(stock=>{
-
-      const statusText = {
-
-        watching:"觀察",
-        ready:"準備進場",
-        holding:"持有",
-        closed:"已結束"
-
-      }[stock.status] || stock.status || "";
-
-
-      const adminButtons =
-        currentUser
-        ? `
-          <div class="actions">
-            <button class="gray"
-              onclick="editStock(${Number(stock.id)})">
-              ✏️ 編輯
-            </button>
-
-            <button class="red"
-              onclick="deleteStock(${Number(stock.id)})">
-              🗑️ 刪除
-            </button>
-          </div>
-        `
-        : "";
-
-
-      return `
-
-        <div class="card">
-
-          <div class="row">
-
-            <div class="stock-title">
-              ${escapeHtml(stock.name || "")}
-
-              <span class="stock-code">
-                ${escapeHtml(stock.symbol || "")}
-              </span>
-            </div>
-
-            <span class="status">
-              ${escapeHtml(statusText)}
-            </span>
-
-          </div>
-
-
-          <div class="meta">
-
-            ${stock.pattern
-              ? `型態：${escapeHtml(stock.pattern)}<br>`
-              : ""}
-
-            ${stock.key_price
-              ? `關鍵價：${escapeHtml(stock.key_price)}<br>`
-              : ""}
-
-            ${stock.entry_price
-              ? `進場：${escapeHtml(stock.entry_price)}<br>`
-              : ""}
-
-            ${stock.stop_price
-              ? `停損：${escapeHtml(stock.stop_price)}<br>`
-              : ""}
-
-            ${stock.memo
-              ? `備註：${escapeHtml(stock.memo)}`
-              : ""}
-
-          </div>
-
-          ${adminButtons}
-
-        </div>
-      `;
-
-    }).join("");
-}
-
-
-/* -------------------------
-   HTML 安全處理
-------------------------- */
-
-function escapeHtml(value){
-
-  return String(value ?? "")
-    .replace(/&/g,"&amp;")
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;")
-    .replace(/"/g,"&quot;")
-    .replace(/'/g,"&#039;");
-}
-
-
-/* -------------------------
-   啟動
-------------------------- */
-
-init();
-
-</script>
-
-</body>
-</html>
+        <option>
