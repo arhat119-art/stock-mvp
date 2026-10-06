@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#111827">
+<meta name="theme-color" content="#070d18">
 
 <title>台股狩獵場 v2</title>
 
@@ -11,23 +11,50 @@
 
 <style>
 
-/* =========================
-   基本設定
-========================= */
+/* =========================================================
+   台股狩獵場 v2
+   深色交易工作台版
+   功能維持原版，只強化視覺
+========================================================= */
 
 *{
   box-sizing:border-box;
 }
 
+html{
+  background:#070d18;
+}
+
 body{
   margin:0;
-  background:#f4f5f7;
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans TC",sans-serif;
-  color:#222;
+  min-height:100vh;
+
+  background:
+    radial-gradient(
+      circle at 50% -10%,
+      rgba(30,64,175,.18),
+      transparent 38%
+    ),
+    linear-gradient(
+      180deg,
+      #0b1220 0%,
+      #080e19 42%,
+      #060b13 100%
+    );
+
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    "Noto Sans TC",
+    sans-serif;
+
+  color:#e5edf8;
 
   opacity:0;
 
-  animation:pageIn .45s ease forwards;
+  animation:
+    pageIn .45s ease forwards;
 }
 
 @keyframes pageIn{
@@ -41,9 +68,9 @@ body{
 }
 
 
-/* =========================
-   Loading 畫面
-========================= */
+/* =========================================================
+   Loading
+========================================================= */
 
 #loadingScreen{
   position:fixed;
@@ -58,8 +85,8 @@ body{
   background:
     radial-gradient(
       circle at 50% 42%,
-      #243653 0%,
-      #111827 46%,
+      #1d3557 0%,
+      #0b1424 46%,
       #020617 100%
     );
 
@@ -86,7 +113,7 @@ body{
 
   border-radius:50%;
 
-  background:rgba(96,165,250,.14);
+  background:rgba(59,130,246,.16);
 
   filter:blur(65px);
 
@@ -103,6 +130,9 @@ body{
   font-size:30px;
   font-weight:800;
   letter-spacing:2px;
+
+  text-shadow:
+    0 0 24px rgba(96,165,250,.35);
 }
 
 .loading-version{
@@ -121,9 +151,9 @@ body{
 
   border:
     3px solid
-    rgba(255,255,255,.18);
+    rgba(255,255,255,.14);
 
-  border-top-color:#fff;
+  border-top-color:#60a5fa;
 
   border-radius:50%;
 
@@ -158,61 +188,132 @@ body{
 }
 
 
-/* =========================
+/* =========================================================
    Header
-========================= */
+========================================================= */
 
 header{
-  background:#111827;
+  position:relative;
+
+  background:
+    linear-gradient(
+      135deg,
+      #111c2f,
+      #0b1424
+    );
+
   color:#fff;
 
   padding:18px 16px;
 
+  border-bottom:
+    1px solid
+    rgba(96,165,250,.12);
+
   box-shadow:
-    0 3px 14px rgba(0,0,0,.12);
+    0 8px 30px rgba(0,0,0,.30);
+
+  overflow:hidden;
+}
+
+header::after{
+  content:"";
+
+  position:absolute;
+
+  width:180px;
+  height:180px;
+
+  right:-70px;
+  top:-90px;
+
+  border-radius:50%;
+
+  background:
+    rgba(59,130,246,.08);
+
+  filter:blur(30px);
+
+  pointer-events:none;
 }
 
 h1{
   margin:0;
+
   font-size:24px;
+
+  letter-spacing:.5px;
+
+  text-shadow:
+    0 2px 15px rgba(0,0,0,.35);
 }
 
 .sub{
   font-size:13px;
-  opacity:.75;
-  margin-top:4px;
+
+  color:#8ea1bb;
+
+  margin-top:5px;
+}
+
+header .row{
+  position:relative;
+  z-index:1;
 }
 
 
-/* =========================
+/* =========================================================
    主要內容
-========================= */
+========================================================= */
 
 main{
+  position:relative;
+
   max-width:720px;
+
   margin:auto;
+
   padding:14px;
+
+  z-index:1;
 }
 
 
-/* =========================
+/* =========================================================
    卡片
-========================= */
+========================================================= */
 
 .card{
-  background:#fff;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(20,31,49,.96),
+      rgba(12,20,33,.96)
+    );
 
-  border-radius:16px;
+  border:
+    1px solid
+    rgba(148,163,184,.10);
 
-  padding:14px;
+  border-radius:17px;
+
+  padding:15px;
 
   margin-bottom:12px;
 
   box-shadow:
-    0 2px 8px rgba(0,0,0,.06);
+    0 10px 30px rgba(0,0,0,.22),
+    inset 0 1px 0 rgba(255,255,255,.025);
 
   animation:
     cardIn .42s ease both;
+
+  backdrop-filter:blur(8px);
+}
+
+.card:hover{
+  border-color:
+    rgba(96,165,250,.18);
 }
 
 @keyframes cardIn{
@@ -231,9 +332,9 @@ main{
 }
 
 
-/* =========================
+/* =========================================================
    按鈕
-========================= */
+========================================================= */
 
 button,
 input,
@@ -244,9 +345,11 @@ textarea{
 }
 
 button{
-  border:0;
+  border:
+    1px solid
+    rgba(148,163,184,.14);
 
-  border-radius:9px;
+  border-radius:11px;
 
   padding:9px 13px;
 
@@ -255,7 +358,13 @@ button{
   transition:
     transform .12s ease,
     opacity .12s ease,
-    box-shadow .12s ease;
+    box-shadow .15s ease,
+    border-color .15s ease;
+
+  color:#dbe7f5;
+
+  background:
+    #172235;
 }
 
 button:active{
@@ -263,76 +372,186 @@ button:active{
 }
 
 button:hover{
-  opacity:.9;
+  opacity:1;
+
+  border-color:
+    rgba(96,165,250,.35);
+
+  box-shadow:
+    0 4px 16px rgba(0,0,0,.20);
 }
+
+
+/* 主要按鈕 */
 
 .primary{
-  background:#111827;
+  background:
+    linear-gradient(
+      135deg,
+      #2563eb,
+      #1d4ed8
+    );
+
   color:#fff;
+
+  border-color:
+    rgba(96,165,250,.45);
+
+  box-shadow:
+    0 5px 18px rgba(37,99,235,.25);
 }
+
+
+/* 新增 */
 
 .green{
-  background:#16803c;
+  background:
+    linear-gradient(
+      135deg,
+      #15803d,
+      #166534
+    );
+
   color:#fff;
+
+  border-color:
+    rgba(74,222,128,.30);
+
+  box-shadow:
+    0 5px 16px rgba(22,101,52,.20);
 }
+
+
+/* 刪除 */
 
 .red{
-  background:#c62828;
+  background:
+    linear-gradient(
+      135deg,
+      #991b1b,
+      #7f1d1d
+    );
+
   color:#fff;
+
+  border-color:
+    rgba(248,113,113,.25);
 }
+
+
+/* 一般灰色按鈕 */
 
 .gray{
-  background:#e5e7eb;
-  color:#222;
+  background:
+    #182438;
+
+  color:#cbd5e1;
+
+  border:
+    1px solid
+    rgba(148,163,184,.18);
 }
 
 
-/* =========================
+/* =========================================================
+   Header 登入按鈕
+========================================================= */
+
+header #loginBtn,
+header #logoutBtn{
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(37,99,235,.16),
+      rgba(30,41,59,.9)
+    );
+
+  color:#dbeafe;
+
+  border:
+    1px solid
+    rgba(96,165,250,.35);
+
+  box-shadow:
+    0 0 18px rgba(59,130,246,.08);
+}
+
+header #loginBtn:hover,
+header #logoutBtn:hover{
+
+  border-color:
+    rgba(96,165,250,.70);
+
+  box-shadow:
+    0 0 20px rgba(59,130,246,.16);
+}
+
+
+/* =========================================================
    輸入框
-========================= */
+========================================================= */
 
 input,
 select,
 textarea{
+
   width:100%;
 
-  padding:10px;
+  padding:10px 11px;
 
   border:
     1px solid
-    #d1d5db;
+    rgba(148,163,184,.18);
 
-  border-radius:9px;
+  border-radius:11px;
 
-  background:#fff;
+  background:
+    #0d1727;
+
+  color:#e5edf8;
 
   outline:none;
 
   transition:
     border-color .15s ease,
-    box-shadow .15s ease;
+    box-shadow .15s ease,
+    background .15s ease;
+}
+
+input::placeholder,
+textarea::placeholder{
+  color:#64748b;
 }
 
 input:focus,
 select:focus,
 textarea:focus{
 
-  border-color:#64748b;
+  border-color:
+    #3b82f6;
+
+  background:
+    #0e1a2d;
 
   box-shadow:
     0 0 0 3px
-    rgba(100,116,139,.12);
-}
-
-textarea{
-  min-height:80px;
-  resize:vertical;
+    rgba(59,130,246,.12),
+    0 0 18px
+    rgba(37,99,235,.08);
 }
 
 
-/* =========================
+/* 下拉箭頭區域 */
+
+select{
+  appearance:auto;
+}
+
+
+/* =========================================================
    表單
-========================= */
+========================================================= */
 
 .form-grid{
 
@@ -349,6 +568,7 @@ textarea{
 }
 
 .tools{
+
   display:flex;
 
   gap:8px;
@@ -359,27 +579,55 @@ textarea{
 }
 
 
-/* =========================
-   狀態
-========================= */
+/* =========================================================
+   Label
+========================================================= */
+
+label{
+
+  display:block;
+
+  color:#94a3b8;
+
+  font-size:13px;
+
+  font-weight:600;
+
+  margin-bottom:5px;
+}
+
+
+/* =========================================================
+   狀態標籤
+========================================================= */
 
 .status{
 
-  padding:4px 8px;
+  padding:5px 9px;
 
   border-radius:20px;
 
-  background:#eef2ff;
+  background:
+    rgba(59,130,246,.12);
+
+  border:
+    1px solid
+    rgba(96,165,250,.18);
+
+  color:#93c5fd;
 
   font-size:12px;
 
   white-space:nowrap;
+
+  box-shadow:
+    0 0 12px rgba(59,130,246,.05);
 }
 
 
-/* =========================
+/* =========================================================
    排版
-========================= */
+========================================================= */
 
 .row{
 
@@ -394,63 +642,94 @@ textarea{
 
 .meta{
 
-  color:#555;
+  color:#aab8ca;
 
   font-size:14px;
 
-  line-height:1.7;
+  line-height:1.8;
 
-  margin-top:8px;
+  margin-top:10px;
+}
+
+.meta::first-line{
+  color:#cbd5e1;
 }
 
 .actions{
 
   display:flex;
 
-  gap:6px;
+  gap:7px;
 
-  margin-top:10px;
+  margin-top:12px;
+}
+
+.actions button{
+  flex:1;
 }
 
 .hidden{
-  display:none;
+  display:none !important;
 }
 
 
-/* =========================
+/* =========================================================
    登入
-========================= */
+========================================================= */
 
 #loginBox{
+
   max-width:420px;
+
   margin:30px auto;
+
+  border-color:
+    rgba(96,165,250,.22);
+
+  box-shadow:
+    0 15px 45px rgba(0,0,0,.35),
+    0 0 25px rgba(37,99,235,.05);
+}
+
+#loginBox h2{
+  margin-top:0;
+  color:#e2e8f0;
 }
 
 .small{
+
   font-size:13px;
-  color:#666;
+
+  color:#7f91a8;
 }
 
 .message{
+
   margin-top:8px;
-  color:#c62828;
+
+  color:#f87171;
+
   font-size:14px;
 }
 
 
-/* =========================
+/* =========================================================
    股票名稱
-========================= */
+========================================================= */
 
 .stock-title{
-  font-size:18px;
-  font-weight:700;
+
+  font-size:19px;
+
+  font-weight:750;
+
+  letter-spacing:.2px;
 }
 
 
-/* =========================
+/* =========================================================
    Yahoo 個股連結
-========================= */
+========================================================= */
 
 .stock-link{
 
@@ -458,28 +737,35 @@ textarea{
 
   align-items:center;
 
-  gap:5px;
+  gap:6px;
 
-  color:inherit;
+  color:#f1f5f9;
 
   text-decoration:none;
 
   transition:
     transform .15s ease,
-    opacity .15s ease;
+    opacity .15s ease,
+    color .15s ease;
 }
 
 .stock-link:hover{
-  opacity:.7;
+
+  opacity:1;
+
+  color:#93c5fd;
+
 }
 
 .stock-link:active{
+
   transform:scale(.97);
+
 }
 
 .stock-code{
 
-  color:#666;
+  color:#7f91a8;
 
   font-size:14px;
 
@@ -490,29 +776,117 @@ textarea{
 
   font-size:12px;
 
-  color:#64748b;
+  color:#60a5fa;
 
-  opacity:.8;
+  opacity:.9;
+
+  transition:
+    transform .15s ease;
+}
+
+.stock-link:hover .yahoo-icon{
+  transform:
+    translate(2px,-2px);
 }
 
 
-/* =========================
+/* =========================================================
    搜尋
-========================= */
+========================================================= */
 
 #search{
+
   flex:1;
+
   min-width:180px;
+
+  background:
+    #0b1524;
+
+  border-color:
+    rgba(96,165,250,.16);
+}
+
+#search:focus{
+  border-color:#3b82f6;
 }
 
 #filterStatus{
+
   min-width:130px;
+
+  background:
+    #0b1524;
+
+  border-color:
+    rgba(96,165,250,.16);
 }
 
 
-/* =========================
+/* =========================================================
+   搜尋卡片
+========================================================= */
+
+main > .card:first-of-type{
+
+  border-color:
+    rgba(96,165,250,.10);
+}
+
+
+/* =========================================================
+   管理員面板
+========================================================= */
+
+#adminPanel{
+
+  border-color:
+    rgba(74,222,128,.16);
+
+  box-shadow:
+    0 10px 35px rgba(0,0,0,.25),
+    0 0 25px rgba(34,197,94,.035);
+}
+
+#adminPanel h2{
+  color:#e2e8f0;
+}
+
+
+/* =========================================================
+   分隔與小細節
+========================================================= */
+
+strong{
+  color:#e2e8f0;
+}
+
+h2{
+  color:#e2e8f0;
+}
+
+a{
+  -webkit-tap-highlight-color:transparent;
+}
+
+
+/* =========================================================
+   空白狀態
+========================================================= */
+
+#list > .card.small{
+
+  text-align:center;
+
+  color:#718198;
+
+  padding:28px 15px;
+}
+
+
+/* =========================================================
    手機版
-========================= */
+========================================================= */
 
 @media(max-width:520px){
 
@@ -553,6 +927,33 @@ textarea{
     width:100%;
   }
 
+  .stock-title{
+    font-size:18px;
+  }
+
+  .card{
+    border-radius:16px;
+  }
+
+}
+
+
+/* =========================================================
+   手機點擊效果
+========================================================= */
+
+@media(hover:none){
+
+  button:active{
+    box-shadow:
+      0 0 0 3px
+      rgba(59,130,246,.10);
+  }
+
+  .stock-link:active{
+    opacity:.7;
+  }
+
 }
 
 </style>
@@ -562,9 +963,9 @@ textarea{
 <body>
 
 
-<!-- =========================
-     Loading 畫面
-========================= -->
+<!-- =======================================================
+     Loading
+======================================================= -->
 
 <div id="loadingScreen">
 
@@ -591,10 +992,9 @@ textarea{
 </div>
 
 
-
-<!-- =========================
+<!-- =======================================================
      Header
-========================= -->
+======================================================= -->
 
 <header>
 
@@ -639,13 +1039,12 @@ textarea{
 </header>
 
 
-
 <main>
 
 
-<!-- =========================
+<!-- =======================================================
      登入區
-========================= -->
+======================================================= -->
 
 <div
   id="loginBox"
@@ -715,10 +1114,9 @@ textarea{
 </div>
 
 
-
-<!-- =========================
+<!-- =======================================================
      管理員區
-========================= -->
+======================================================= -->
 
 <div
   id="adminPanel"
@@ -742,7 +1140,6 @@ textarea{
     class="form-grid"
     style="margin-top:12px"
   >
-
 
     <div>
 
@@ -917,10 +1314,9 @@ textarea{
 </div>
 
 
-
-<!-- =========================
+<!-- =======================================================
      搜尋區
-========================= -->
+======================================================= -->
 
 <div class="card">
 
@@ -928,7 +1324,7 @@ textarea{
 
     <input
       id="search"
-      placeholder="搜尋股票名稱或代號"
+      placeholder="🔎 搜尋股票名稱或代號"
       oninput="render()"
     >
 
@@ -991,10 +1387,9 @@ textarea{
 </div>
 
 
-
-<!-- =========================
+<!-- =======================================================
      股票列表
-========================= -->
+======================================================= -->
 
 <div id="list"></div>
 
@@ -1002,13 +1397,12 @@ textarea{
 </main>
 
 
-
 <script>
 
 
-/* =========================
+/* =========================================================
    Supabase 設定
-========================= */
+========================================================= */
 
 const SUPABASE_URL =
 "https://dfzmpdllwggmowqxmfnm.supabase.co";
@@ -1031,17 +1425,9 @@ let currentUser = null;
 let editingId = null;
 
 
-/* =========================
+/* =========================================================
    Loading
-========================= */
-
-/*
-  注意：
-  Loading 不等待 Supabase。
-
-  最多約 1.2 秒就會消失，
-  因此即使網路慢也不會卡死。
-*/
+========================================================= */
 
 let loadingHidden = false;
 
@@ -1070,23 +1456,15 @@ function hideLoading(){
 }
 
 
-/*
-  保險機制：
-
-  網站啟動後 1.2 秒，
-  Loading 一定會消失。
-*/
-
 setTimeout(
   hideLoading,
   1200
 );
 
 
-
-/* =========================
-   Yahoo 股市連結
-========================= */
+/* =========================================================
+   Yahoo 股市
+========================================================= */
 
 function yahooUrl(symbol){
 
@@ -1095,20 +1473,6 @@ function yahooUrl(symbol){
       .trim()
       .toUpperCase();
 
-
-  /*
-    例如：
-
-    1605
-    2392
-    6901
-
-    自動變成：
-
-    1605.TW
-    2392.TW
-    6901.TW
-  */
 
   if(
     !/^\d{4,6}$/.test(code)
@@ -1130,18 +1494,13 @@ function yahooUrl(symbol){
 }
 
 
-
-/* =========================
+/* =========================================================
    初始化
-========================= */
+========================================================= */
 
 async function init(){
 
   try{
-
-    /*
-      取得目前登入狀態
-    */
 
     const {data} =
       await sb.auth.getSession();
@@ -1156,16 +1515,8 @@ async function init(){
     updateAuthUI();
 
 
-    /*
-      載入股票資料
-    */
-
     await loadData();
 
-
-    /*
-      監聽登入 / 登出
-    */
 
     sb.auth.onAuthStateChange(
       (_event,session)=>{
@@ -1195,9 +1546,9 @@ async function init(){
 }
 
 
-/* =========================
+/* =========================================================
    載入資料
-========================= */
+========================================================= */
 
 async function loadData(){
 
@@ -1254,9 +1605,9 @@ async function loadData(){
 }
 
 
-/* =========================
+/* =========================================================
    登入 UI
-========================= */
+========================================================= */
 
 function updateAuthUI(){
 
@@ -1334,9 +1685,9 @@ function updateAuthUI(){
 }
 
 
-/* =========================
+/* =========================================================
    登入視窗
-========================= */
+========================================================= */
 
 function showLogin(){
 
@@ -1368,9 +1719,9 @@ function hideLogin(){
 }
 
 
-/* =========================
+/* =========================================================
    登入
-========================= */
+========================================================= */
 
 async function login(){
 
@@ -1444,9 +1795,9 @@ async function login(){
 }
 
 
-/* =========================
+/* =========================================================
    登出
-========================= */
+========================================================= */
 
 async function logout(){
 
@@ -1457,9 +1808,9 @@ async function logout(){
 }
 
 
-/* =========================
+/* =========================================================
    新增 / 修改
-========================= */
+========================================================= */
 
 async function addStock(){
 
@@ -1588,9 +1939,9 @@ async function addStock(){
 }
 
 
-/* =========================
+/* =========================================================
    編輯
-========================= */
+========================================================= */
 
 function editStock(id){
 
@@ -1690,9 +2041,9 @@ function editStock(id){
 }
 
 
-/* =========================
+/* =========================================================
    刪除
-========================= */
+========================================================= */
 
 async function deleteStock(id){
 
@@ -1742,9 +2093,9 @@ async function deleteStock(id){
 }
 
 
-/* =========================
+/* =========================================================
    清除表單
-========================= */
+========================================================= */
 
 function clearForm(){
 
@@ -1807,9 +2158,9 @@ function clearForm(){
 }
 
 
-/* =========================
+/* =========================================================
    顯示股票列表
-========================= */
+========================================================= */
 
 function render(){
 
@@ -1951,9 +2302,7 @@ function render(){
 
           <div class="row">
 
-
             <div class="stock-title">
-
 
               ${
                 yahoo !== "#"
@@ -2010,7 +2359,6 @@ function render(){
 
               }
 
-
             </div>
 
 
@@ -2022,12 +2370,10 @@ function render(){
 
             </span>
 
-
           </div>
 
 
           <div class="meta">
-
 
             ${
               stock.pattern
@@ -2108,12 +2454,10 @@ function render(){
               ""
             }
 
-
           </div>
 
 
           ${adminButtons}
-
 
         </div>
 
@@ -2126,9 +2470,9 @@ function render(){
 }
 
 
-/* =========================
+/* =========================================================
    HTML 安全處理
-========================= */
+========================================================= */
 
 function escapeHtml(value){
 
@@ -2164,9 +2508,9 @@ function escapeHtml(value){
 }
 
 
-/* =========================
-   啟動網站
-========================= */
+/* =========================================================
+   啟動
+========================================================= */
 
 init();
 
