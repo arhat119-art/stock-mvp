@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="zh-Hant">
 <head>
@@ -6,170 +7,907 @@
 <meta name="theme-color" content="#070d18">
 <title>台股狩獵場 v3｜交易計畫版</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
-:root{color-scheme:dark;--bg:#070d18;--panel:#111c2f;--field:#0b1524;--line:#26364d;--text:#e5edf8;--muted:#94a3b8;--blue:#2563eb;--green:#15803d;--red:#991b1b}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 50% -10%,#172d4d 0,transparent 38%),linear-gradient(180deg,#0b1220,#060b13);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans TC",sans-serif;color:var(--text);line-height:1.5}
-header{padding:17px 15px;border-bottom:1px solid #26364d;background:#0b1424;position:sticky;top:0;z-index:5}
-.head,main{max-width:850px;margin:auto}.head{display:flex;justify-content:space-between;align-items:center;gap:12px}.sub,.muted,.small{color:var(--muted);font-size:13px}h1{font-size:23px;margin:0}h2{font-size:19px;margin:0 0 12px}main{padding:14px}.panel,.stock{background:linear-gradient(145deg,#142035,#0c1421);border:1px solid #26364d;border-radius:16px;padding:15px;margin-bottom:13px;box-shadow:0 10px 28px #0003}
-button{border:1px solid #34465e;border-radius:10px;padding:9px 12px;color:#e5edf8;background:#172438;font:inherit;cursor:pointer}button.primary{background:var(--blue);border-color:#3b82f6;color:white}button.green{background:var(--green);color:white}button.red{background:var(--red);color:white}button:disabled{opacity:.5}
-input,select,textarea{width:100%;padding:10px 11px;border:1px solid #34465e;border-radius:10px;background:var(--field);color:var(--text);font:inherit}textarea{min-height:76px;resize:vertical}label{display:block;color:#b6c5d8;font-size:13px;font-weight:650;margin:0 0 5px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.field.full{grid-column:1/-1}.section-title{grid-column:1/-1;border-bottom:1px solid #26364d;padding:8px 0 5px;color:#93c5fd;font-weight:750;margin-top:3px}.row{display:flex;align-items:center;justify-content:space-between;gap:9px;flex-wrap:wrap}.tools{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.hidden{display:none!important}.badge{display:inline-block;padding:4px 9px;border-radius:20px;background:#1d3554;color:#bfdbfe;font-size:12px;border:1px solid #315071}.stock h3{font-size:19px;margin:0}.stock a{color:inherit;text-decoration:none}.stock a:hover{color:#93c5fd}.stock-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:12px}.datum{background:#0a1321;border:1px solid #23344a;border-radius:10px;padding:9px;min-width:0;overflow-wrap:anywhere}.datum .k{font-size:12px;color:#91a4bd;margin-bottom:3px}.datum .v{white-space:pre-wrap}.datum.full{grid-column:1/-1}.actions{display:flex;gap:8px;margin-top:12px}.actions button{flex:1}.message{margin-top:9px;color:#fca5a5;font-size:13px;white-space:pre-wrap}.ok{color:#86efac}.empty{text-align:center;color:var(--muted);padding:24px}.hint{font-size:12px;color:#7f91a8;margin-top:4px}.danger-note{color:#fbbf24;font-size:13px;margin-top:8px}
-@media(max-width:560px){.grid,.stock-grid{grid-template-columns:1fr}.field.full,.datum.full{grid-column:auto}.head{align-items:flex-start}h1{font-size:20px}main{padding:10px}.panel,.stock{padding:12px}.actions button{padding:9px 7px}}
+:root{
+  color-scheme:dark;
+  --bg:#070d18;
+  --panel:#111c2f;
+  --field:#0b1524;
+  --line:#26364d;
+  --text:#e5edf8;
+  --muted:#94a3b8;
+  --blue:#2563eb;
+  --green:#15803d;
+  --red:#991b1b
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  background:radial-gradient(circle at 50% -10%,#172d4d 0,transparent 38%),linear-gradient(180deg,#0b1220,#060b13);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans TC",sans-serif;
+  color:var(--text);
+  line-height:1.5
+}
+
+/* 載入動畫 */
+#pageLoader{
+  position:fixed;
+  inset:0;
+  z-index:9999;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:18px;
+  background:#070d18;
+  color:#e5edf8;
+  transition:opacity .3s ease,visibility .3s ease
+}
+
+#pageLoader.loader-hidden{
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none
+}
+
+.loader-spinner{
+  width:48px;
+  height:48px;
+  border:4px solid #26364d;
+  border-top-color:#60a5fa;
+  border-right-color:#60a5fa;
+  border-radius:50%;
+  animation:huntingSpin .8s linear infinite
+}
+
+.loader-title{
+  font-size:20px;
+  font-weight:750;
+  letter-spacing:1px
+}
+
+.loader-caption{
+  color:#94a3b8;
+  font-size:13px
+}
+
+@keyframes huntingSpin{
+  to{transform:rotate(360deg)}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .loader-spinner{animation-duration:2s}
+}
+
+header{
+  padding:17px 15px;
+  border-bottom:1px solid #26364d;
+  background:#0b1424;
+  position:sticky;
+  top:0;
+  z-index:5
+}
+
+.head,main{max-width:850px;margin:auto}
+
+.head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px
+}
+
+.sub,.muted,.small{
+  color:var(--muted);
+  font-size:13px
+}
+
+h1{font-size:23px;margin:0}
+h2{font-size:19px;margin:0 0 12px}
+
+main{padding:14px}
+
+.panel,.stock{
+  background:linear-gradient(145deg,#142035,#0c1421);
+  border:1px solid #26364d;
+  border-radius:16px;
+  padding:15px;
+  margin-bottom:13px;
+  box-shadow:0 10px 28px #0003
+}
+
+button{
+  border:1px solid #34465e;
+  border-radius:10px;
+  padding:9px 12px;
+  color:#e5edf8;
+  background:#172438;
+  font:inherit;
+  cursor:pointer
+}
+
+button.primary{
+  background:var(--blue);
+  border-color:#3b82f6;
+  color:white
+}
+
+button.green{background:var(--green);color:white}
+button.red{background:var(--red);color:white}
+button:disabled{opacity:.5}
+
+input,select,textarea{
+  width:100%;
+  padding:10px 11px;
+  border:1px solid #34465e;
+  border-radius:10px;
+  background:var(--field);
+  color:var(--text);
+  font:inherit
+}
+
+textarea{min-height:76px;resize:vertical}
+
+label{
+  display:block;
+  color:#b6c5d8;
+  font-size:13px;
+  font-weight:650;
+  margin:0 0 5px
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:11px
+}
+
+.field.full{grid-column:1/-1}
+
+.section-title{
+  grid-column:1/-1;
+  border-bottom:1px solid #26364d;
+  padding:8px 0 5px;
+  color:#93c5fd;
+  font-weight:750;
+  margin-top:3px
+}
+
+.row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:9px;
+  flex-wrap:wrap
+}
+
+.tools{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin:12px 0
+}
+
+.hidden{display:none!important}
+
+.badge{
+  display:inline-block;
+  padding:4px 9px;
+  border-radius:20px;
+  background:#1d3554;
+  color:#bfdbfe;
+  font-size:12px;
+  border:1px solid #315071
+}
+
+.stock h3{font-size:19px;margin:0}
+
+.stock a{
+  color:inherit;
+  text-decoration:none
+}
+
+.stock a:hover{color:#93c5fd}
+
+.stock-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px;
+  margin-top:12px
+}
+
+.datum{
+  background:#0a1321;
+  border:1px solid #23344a;
+  border-radius:10px;
+  padding:9px;
+  min-width:0;
+  overflow-wrap:anywhere
+}
+
+.datum .k{
+  font-size:12px;
+  color:#91a4bd;
+  margin-bottom:3px
+}
+
+.datum .v{white-space:pre-wrap}
+.datum.full{grid-column:1/-1}
+
+.actions{
+  display:flex;
+  gap:8px;
+  margin-top:12px
+}
+
+.actions button{flex:1}
+
+.message{
+  margin-top:9px;
+  color:#fca5a5;
+  font-size:13px;
+  white-space:pre-wrap
+}
+
+.ok{color:#86efac}
+
+.empty{
+  text-align:center;
+  color:var(--muted);
+  padding:24px
+}
+
+.hint{
+  font-size:12px;
+  color:#7f91a8;
+  margin-top:4px
+}
+
+.danger-note{
+  color:#fbbf24;
+  font-size:13px;
+  margin-top:8px
+}
+
+@media(max-width:560px){
+  .grid,.stock-grid{grid-template-columns:1fr}
+  .field.full,.datum.full{grid-column:auto}
+  .head{align-items:flex-start}
+  h1{font-size:20px}
+  main{padding:10px}
+  .panel,.stock{padding:12px}
+  .actions button{padding:9px 7px}
+}
 </style>
 </head>
+
 <body>
-<header><div class="head"><div><h1>台股狩獵場 v3</h1><div class="sub">交易計畫・關鍵價・事後驗證</div></div><div><button id="loginBtn" onclick="showLogin()">管理員登入</button><button id="logoutBtn" class="hidden" onclick="logout()">登出</button></div></div></header>
+
+<!-- 網頁初次開啟時顯示的載入畫面 -->
+<div id="pageLoader" role="status" aria-live="polite">
+  <div class="loader-spinner"></div>
+  <div class="loader-title">台股狩獵場 v3</div>
+  <div class="loader-caption">正在準備口袋名單…</div>
+</div>
+
+<header>
+  <div class="head">
+    <div>
+      <h1>台股狩獵場 v3</h1>
+      <div class="sub">交易計畫・關鍵價・事後驗證</div>
+    </div>
+    <div>
+      <button id="loginBtn" onclick="showLogin()">管理員登入</button>
+      <button id="logoutBtn" class="hidden" onclick="logout()">登出</button>
+    </div>
+  </div>
+</header>
+
 <main>
+
 <section id="loginBox" class="panel hidden">
-<h2>管理員登入</h2>
-<div class="grid"><div class="field"><label>Email</label><input id="loginEmail" type="email" autocomplete="username" placeholder="管理員 Email"></div><div class="field"><label>密碼</label><input id="loginPassword" type="password" autocomplete="current-password" placeholder="密碼"></div></div>
-<div class="tools"><button class="primary" onclick="login()">登入</button><button onclick="hideLogin()">取消</button></div><div id="loginMessage" class="message"></div>
+  <h2>管理員登入</h2>
+  <div class="grid">
+    <div class="field">
+      <label>Email</label>
+      <input id="loginEmail" type="email" autocomplete="username" placeholder="管理員 Email">
+    </div>
+    <div class="field">
+      <label>密碼</label>
+      <input id="loginPassword" type="password" autocomplete="current-password" placeholder="密碼">
+    </div>
+  </div>
+  <div class="tools">
+    <button class="primary" onclick="login()">登入</button>
+    <button onclick="hideLogin()">取消</button>
+  </div>
+  <div id="loginMessage" class="message"></div>
 </section>
 
 <section id="adminPanel" class="panel hidden">
-<div class="row"><h2 id="formTitle">新增口袋標的／交易計畫</h2><span class="badge">管理員模式</span></div>
-<form id="stockForm" onsubmit="saveStock(event)">
-<div class="grid">
-<div class="section-title">一、標的與交易狀態</div>
-<div class="field"><label for="name">股票名稱 *</label><input id="name" required placeholder="例如：正崴"></div>
-<div class="field"><label for="symbol">股票代號 *</label><input id="symbol" required inputmode="numeric" placeholder="例如：2392"></div>
-<div class="field"><label for="pattern">型態分類</label><select id="pattern"><option>突破回測不破</option><option>破底翻</option><option>日K破底翻</option><option>底部整理</option><option>其他</option></select></div>
-<div class="field"><label for="timeframe">主要判斷週期</label><select id="timeframe"><option>週K主判斷／月K確認／日K進場</option><option>月K主判斷／週K確認／日K進場</option><option>週K判斷／日K進場</option><option>日K短線機會</option><option>其他</option></select></div>
-<div class="field"><label for="keyPrice">關鍵價／區間</label><input id="keyPrice" placeholder="例如：39.15 或 28–32"></div>
-<div class="field"><label for="entryPrice">預計進場價</label><input id="entryPrice" placeholder="價格或條件"></div>
-<div class="field"><label for="stopPrice">停損／失效價格</label><input id="stopPrice" placeholder="例如：週收盤跌破 37"></div>
-<div class="field"><label for="targetPrice">目標價</label><input id="targetPrice" placeholder="目標價格或區間"></div>
-<div class="field"><label for="status">目前狀態</label><select id="status"><option value="watching">觀察中</option><option value="ready">準備進場</option><option value="holding">持有中</option><option value="closed">已結束</option></select></div>
-<div class="field"><label for="reviewStatus">事後驗證狀態</label><select id="reviewStatus"><option value="pending">待驗證</option><option value="valid">型態成立</option><option value="invalid">型態失效</option><option value="reviewed">已完成檢討</option></select></div>
-<div class="section-title">二、進場前的交易假設</div>
-<div class="field full"><label for="hypothesis">選股假設／為什麼注意它</label><textarea id="hypothesis" placeholder="例如：週K底部突破，回測前波關鍵價未破；尚未大幅噴出。"></textarea></div>
-<div class="field full"><label for="keyMeaning">關鍵價的意義</label><textarea id="keyMeaning" placeholder="例如：前波整理區壓力、突破翻多價、回測支撐。"></textarea></div>
-<div class="field full"><label for="entryTrigger">進場觸發條件</label><textarea id="entryTrigger" placeholder="例如：回測 17 元有明顯支撐才試單；若直接急漲不追。"></textarea></div>
-<div class="field full"><label for="stopReason">停損依據／什麼情況代表判斷失效</label><textarea id="stopReason" placeholder="例如：週K收盤跌破支撐區，代表突破回測失敗。"></textarea></div>
-<div class="field full"><label for="trailingRule">目標與移動停利規則</label><textarea id="trailingRule" placeholder="例如：接近前高分批觀察；從波段高點回落 30% 移動停利。"></textarea></div>
-<div class="section-title">三、事後驗證與檢討</div>
-<div class="field"><label for="reviewDate">檢討日期</label><input id="reviewDate" type="date"></div>
-<div class="field full"><label for="reviewNotes">實際走勢／執行檢討</label><textarea id="reviewNotes" placeholder="事後再填：條件是否觸發？是否照計畫執行？結果與下次改進。"></textarea></div>
-<div class="field full"><label for="memo">其他備註</label><textarea id="memo" placeholder="補充觀察、消息面或其他備註"></textarea></div>
-</div>
-<div class="tools"><button id="saveBtn" class="primary" type="submit">儲存交易計畫</button><button type="button" onclick="clearForm()">清空表單</button></div><div id="formMessage" class="message"></div>
-<p class="hint">建議先寫下計畫再進場；事後檢討時補上結果，不要只依當下情緒修改原始假設。</p>
-</form>
+  <div class="row">
+    <h2 id="formTitle">新增口袋標的／交易計畫</h2>
+    <span class="badge">管理員模式</span>
+  </div>
+
+  <form id="stockForm" onsubmit="saveStock(event)">
+    <div class="grid">
+
+      <div class="section-title">一、標的與交易狀態</div>
+
+      <div class="field">
+        <label for="name">股票名稱 *</label>
+        <input id="name" required placeholder="例如：正崴">
+      </div>
+
+      <div class="field">
+        <label for="symbol">股票代號 *</label>
+        <input id="symbol" required inputmode="numeric" placeholder="例如：2392">
+      </div>
+
+      <div class="field">
+        <label for="pattern">型態分類</label>
+        <select id="pattern">
+          <option>突破回測不破</option>
+          <option>破底翻</option>
+          <option>日K破底翻</option>
+          <option>底部整理</option>
+          <option>其他</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="timeframe">主要判斷週期</label>
+        <select id="timeframe">
+          <option>週K主判斷／月K確認／日K進場</option>
+          <option>月K主判斷／週K確認／日K進場</option>
+          <option>週K判斷／日K進場</option>
+          <option>日K短線機會</option>
+          <option>其他</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="keyPrice">關鍵價／區間</label>
+        <input id="keyPrice" placeholder="例如：39.15 或 28–32">
+      </div>
+
+      <div class="field">
+        <label for="entryPrice">預計進場價</label>
+        <input id="entryPrice" placeholder="價格或條件">
+      </div>
+
+      <div class="field">
+        <label for="stopPrice">停損／失效價格</label>
+        <input id="stopPrice" placeholder="例如：週收盤跌破 37">
+      </div>
+
+      <div class="field">
+        <label for="targetPrice">目標價</label>
+        <input id="targetPrice" placeholder="目標價格或區間">
+      </div>
+
+      <div class="field">
+        <label for="status">目前狀態</label>
+        <select id="status">
+          <option value="watching">觀察中</option>
+          <option value="ready">準備進場</option>
+          <option value="holding">持有中</option>
+          <option value="closed">已結束</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="reviewStatus">事後驗證狀態</label>
+        <select id="reviewStatus">
+          <option value="pending">待驗證</option>
+          <option value="valid">型態成立</option>
+          <option value="invalid">型態失效</option>
+          <option value="reviewed">已完成檢討</option>
+        </select>
+      </div>
+
+      <div class="section-title">二、進場前的交易假設</div>
+
+      <div class="field full">
+        <label for="hypothesis">選股假設／為什麼注意它</label>
+        <textarea id="hypothesis" placeholder="例如：週K底部突破，回測前波關鍵價未破；尚未大幅噴出。"></textarea>
+      </div>
+
+      <div class="field full">
+        <label for="keyMeaning">關鍵價的意義</label>
+        <textarea id="keyMeaning" placeholder="例如：前波整理區壓力、突破翻多價、回測支撐。"></textarea>
+      </div>
+
+      <div class="field full">
+        <label for="entryTrigger">進場觸發條件</label>
+        <textarea id="entryTrigger" placeholder="例如：回測 17 元有明顯支撐才試單；若直接急漲不追。"></textarea>
+      </div>
+
+      <div class="field full">
+        <label for="stopReason">停損依據／什麼情況代表判斷失效</label>
+        <textarea id="stopReason" placeholder="例如：週K收盤跌破支撐區，代表突破回測失敗。"></textarea>
+      </div>
+
+      <div class="field full">
+        <label for="trailingRule">目標與移動停利規則</label>
+        <textarea id="trailingRule" placeholder="例如：接近前高分批觀察；從波段高點回落 30% 移動停利。"></textarea>
+      </div>
+
+      <div class="section-title">三、事後驗證與檢討</div>
+
+      <div class="field">
+        <label for="reviewDate">檢討日期</label>
+        <input id="reviewDate" type="date">
+      </div>
+
+      <div class="field full">
+        <label for="reviewNotes">實際走勢／執行檢討</label>
+        <textarea id="reviewNotes" placeholder="事後再填：條件是否觸發？是否照計畫執行？結果與下次改進。"></textarea>
+      </div>
+
+      <div class="field full">
+        <label for="memo">其他備註</label>
+        <textarea id="memo" placeholder="補充觀察、消息面或其他備註"></textarea>
+      </div>
+
+    </div>
+
+    <div class="tools">
+      <button id="saveBtn" class="primary" type="submit">儲存交易計畫</button>
+      <button type="button" onclick="clearForm()">清空表單</button>
+    </div>
+
+    <div id="formMessage" class="message"></div>
+
+    <p class="hint">建議先寫下計畫再進場；事後檢討時補上結果，不要只依當下情緒修改原始假設。</p>
+  </form>
 </section>
 
 <section class="panel">
-<div class="row"><h2 style="margin:0">口袋名單</h2><span id="count" class="badge">載入中</span></div>
-<div class="tools"><input id="search" placeholder="搜尋股票名稱、代號、型態、關鍵價…" oninput="renderStocks()"><select id="filterStatus" onchange="renderStocks()"><option value="all">所有交易狀態</option><option value="watching">觀察中</option><option value="ready">準備進場</option><option value="holding">持有中</option><option value="closed">已結束</option></select><select id="filterReview" onchange="renderStocks()"><option value="all">所有驗證狀態</option><option value="pending">待驗證</option><option value="valid">型態成立</option><option value="invalid">型態失效</option><option value="reviewed">已完成檢討</option></select></div>
-<div id="loadMessage" class="small">正在載入口袋名單…</div><div id="list"></div>
+  <div class="row">
+    <h2 style="margin:0">口袋名單</h2>
+    <span id="count" class="badge">載入中</span>
+  </div>
+
+  <div class="tools">
+    <input id="search" placeholder="搜尋股票名稱、代號、型態、關鍵價…" oninput="renderStocks()">
+
+    <select id="filterStatus" onchange="renderStocks()">
+      <option value="all">所有交易狀態</option>
+      <option value="watching">觀察中</option>
+      <option value="ready">準備進場</option>
+      <option value="holding">持有中</option>
+      <option value="closed">已結束</option>
+    </select>
+
+    <select id="filterReview" onchange="renderStocks()">
+      <option value="all">所有驗證狀態</option>
+      <option value="pending">待驗證</option>
+      <option value="valid">型態成立</option>
+      <option value="invalid">型態失效</option>
+      <option value="reviewed">已完成檢討</option>
+    </select>
+  </div>
+
+  <div id="loadMessage" class="small">正在載入口袋名單…</div>
+  <div id="list"></div>
 </section>
-<p class="small">注意：本工具用於記錄個人觀察與交易計畫，不會自動判斷買賣點，也不保證交易結果。</p>
+
+<p class="small">
+  注意：本工具用於記錄個人觀察與交易計畫，不會自動判斷買賣點，也不保證交易結果。
+</p>
+
 </main>
+
 <script>
 const SUPABASE_URL = "https://dfzmpdllwggmowqxmfnm.supabase.co";
 const SUPABASE_KEY = "sb_publishable_MlI3Rkr5IbhQVmhUZV8Z6g_mNQ3r0fR";
+
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
 let stocks = [];
 let currentUser = null;
 let editingId = null;
 
 const fields = {
- name:"name", symbol:"symbol", pattern:"pattern", timeframe:"timeframe",
- keyPrice:"key_price", entryPrice:"entry_price", stopPrice:"stop_price",
- targetPrice:"target_price", status:"status", reviewStatus:"review_status",
- hypothesis:"hypothesis", keyMeaning:"key_price_meaning", entryTrigger:"entry_trigger",
- stopReason:"stop_reason", trailingRule:"trailing_rule", reviewDate:"review_date",
- reviewNotes:"review_notes", memo:"memo"
+  name:"name",
+  symbol:"symbol",
+  pattern:"pattern",
+  timeframe:"timeframe",
+  keyPrice:"key_price",
+  entryPrice:"entry_price",
+  stopPrice:"stop_price",
+  targetPrice:"target_price",
+  status:"status",
+  reviewStatus:"review_status",
+  hypothesis:"hypothesis",
+  keyMeaning:"key_price_meaning",
+  entryTrigger:"entry_trigger",
+  stopReason:"stop_reason",
+  trailingRule:"trailing_rule",
+  reviewDate:"review_date",
+  reviewNotes:"review_notes",
+  memo:"memo"
 };
-const statusLabels = {watching:"觀察中",ready:"準備進場",holding:"持有中",closed:"已結束"};
-const reviewLabels = {pending:"待驗證",valid:"型態成立",invalid:"型態失效",reviewed:"已完成檢討"};
-function el(id){return document.getElementById(id)}
-function val(id){return el(id).value.trim()}
-function esc(s){return String(s ?? "").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
-function showLogin(){el("loginBox").classList.remove("hidden");el("loginMessage").textContent=""}
-function hideLogin(){el("loginBox").classList.add("hidden")}
+
+const statusLabels = {
+  watching:"觀察中",
+  ready:"準備進場",
+  holding:"持有中",
+  closed:"已結束"
+};
+
+const reviewLabels = {
+  pending:"待驗證",
+  valid:"型態成立",
+  invalid:"型態失效",
+  reviewed:"已完成檢討"
+};
+
+function el(id){
+  return document.getElementById(id);
+}
+
+function val(id){
+  return el(id).value.trim();
+}
+
+/* 關閉初次載入動畫 */
+function hidePageLoader(){
+  const loader = el("pageLoader");
+  if(loader) loader.classList.add("loader-hidden");
+}
+
+function esc(s){
+  return String(s ?? "").replace(/[&<>"']/g,c=>({
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;",
+    '"':"&quot;",
+    "'":"&#39;"
+  }[c]));
+}
+
+function showLogin(){
+  el("loginBox").classList.remove("hidden");
+  el("loginMessage").textContent="";
+}
+
+function hideLogin(){
+  el("loginBox").classList.add("hidden");
+}
+
 async function login(){
- el("loginMessage").textContent="";
- const {data,error}=await sb.auth.signInWithPassword({email:val("loginEmail"),password:el("loginPassword").value});
- if(error){el("loginMessage").textContent="登入失敗："+error.message;return}
- currentUser=data.user;updateAuthUI();hideLogin();await loadData();
+  el("loginMessage").textContent="登入中…";
+
+  try{
+    const {data,error}=await sb.auth.signInWithPassword({
+      email:val("loginEmail"),
+      password:el("loginPassword").value
+    });
+
+    if(error){
+      el("loginMessage").textContent="登入失敗："+error.message;
+      return;
+    }
+
+    currentUser=data.user;
+    updateAuthUI();
+    hideLogin();
+    await loadData();
+
+  }catch(error){
+    el("loginMessage").textContent=
+      "登入發生錯誤："+(error.message||"請稍後重試");
+  }
 }
-async function logout(){await sb.auth.signOut();currentUser=null;updateAuthUI();clearForm();await loadData()}
+
+async function logout(){
+  const {error}=await sb.auth.signOut();
+
+  if(error){
+    alert("登出失敗："+error.message);
+    return;
+  }
+
+  currentUser=null;
+  updateAuthUI();
+  clearForm();
+  await loadData();
+}
+
 function updateAuthUI(){
- el("loginBtn").classList.toggle("hidden",!!currentUser);
- el("logoutBtn").classList.toggle("hidden",!currentUser);
- el("adminPanel").classList.toggle("hidden",!currentUser);
+  el("loginBtn").classList.toggle("hidden",!!currentUser);
+  el("logoutBtn").classList.toggle("hidden",!currentUser);
+  el("adminPanel").classList.toggle("hidden",!currentUser);
 }
+
+/* 載入雲端資料；初次載入完成後關閉動畫 */
 async function loadData(){
- el("loadMessage").textContent="正在載入資料…";
- const {data,error}=await sb.from("pocket_stocks").select("*").order("created_at",{ascending:false});
- if(error){stocks=[];el("loadMessage").textContent="讀取失敗："+error.message+"。請確認 Supabase 資料表與欄位已設定。";renderStocks();return}
- stocks=data||[];el("loadMessage").textContent=stocks.length?"資料已更新":"目前還沒有口袋名單，登入管理員後即可新增。";renderStocks();
+  el("loadMessage").textContent="正在載入資料…";
+
+  try{
+    const {data,error}=await sb
+      .from("pocket_stocks")
+      .select("*")
+      .order("created_at",{ascending:false});
+
+    if(error){
+      stocks=[];
+      el("loadMessage").textContent=
+        "讀取失敗："+error.message+
+        "。請確認 Supabase 資料表與欄位已設定。";
+      renderStocks();
+      return;
+    }
+
+    stocks=data||[];
+
+    el("loadMessage").textContent=stocks.length
+      ?"資料已更新"
+      :"目前還沒有口袋名單，登入管理員後即可新增。";
+
+    renderStocks();
+
+  }catch(error){
+    stocks=[];
+    el("loadMessage").textContent=
+      "載入發生錯誤："+(error.message||"請稍後重試");
+    renderStocks();
+
+  }finally{
+    hidePageLoader();
+  }
 }
+
 async function saveStock(event){
- event.preventDefault();if(!currentUser){el("formMessage").textContent="請先登入管理員。";return}
- el("formMessage").textContent="儲存中…";el("saveBtn").disabled=true;
- const payload={};
- for(const [id,column] of Object.entries(fields)){payload[column]=val(id)||null}
- if(!payload.name||!payload.symbol){el("formMessage").textContent="請填寫股票名稱與代號。";el("saveBtn").disabled=false;return}
- let result;
- if(editingId) result=await sb.from("pocket_stocks").update(payload).eq("id",editingId).select();
- else result=await sb.from("pocket_stocks").insert(payload).select();
- el("saveBtn").disabled=false;
- if(result.error){el("formMessage").textContent="儲存失敗："+result.error.message+"\n請確認已執行下方資料庫欄位新增 SQL。";return}
- el("formMessage").textContent=editingId?"更新完成。":"新增完成。";
- clearForm(false);await loadData();
+  event.preventDefault();
+
+  if(!currentUser){
+    el("formMessage").textContent="請先登入管理員。";
+    return;
+  }
+
+  el("formMessage").textContent="儲存中…";
+  el("saveBtn").disabled=true;
+
+  const payload={};
+
+  for(const [id,column] of Object.entries(fields)){
+    payload[column]=val(id)||null;
+  }
+
+  if(!payload.name||!payload.symbol){
+    el("formMessage").textContent="請填寫股票名稱與代號。";
+    el("saveBtn").disabled=false;
+    return;
+  }
+
+  try{
+    let result;
+
+    if(editingId){
+      result=await sb
+        .from("pocket_stocks")
+        .update(payload)
+        .eq("id",editingId)
+        .select();
+    }else{
+      result=await sb
+        .from("pocket_stocks")
+        .insert(payload)
+        .select();
+    }
+
+    if(result.error){
+      el("formMessage").textContent=
+        "儲存失敗："+result.error.message+
+        "\n請確認資料庫欄位設定。";
+      return;
+    }
+
+    el("formMessage").textContent=editingId
+      ?"更新完成。"
+      :"新增完成。";
+
+    clearForm(false);
+    await loadData();
+
+  }catch(error){
+    el("formMessage").textContent=
+      "儲存發生錯誤："+(error.message||"請稍後重試");
+
+  }finally{
+    el("saveBtn").disabled=false;
+  }
 }
+
 function editStock(id){
- const s=stocks.find(x=>String(x.id)===String(id));if(!s)return;
- editingId=s.id;
- for(const [field,column] of Object.entries(fields))el(field).value=s[column]??"";
- el("formTitle").textContent="編輯交易計畫";
- el("saveBtn").textContent="儲存修改";
- el("formMessage").textContent="";
- window.scrollTo({top:0,behavior:"smooth"});
+  const s=stocks.find(x=>String(x.id)===String(id));
+  if(!s)return;
+
+  editingId=s.id;
+
+  for(const [field,column] of Object.entries(fields)){
+    el(field).value=s[column]??"";
+  }
+
+  el("formTitle").textContent="編輯交易計畫";
+  el("saveBtn").textContent="儲存修改";
+  el("formMessage").textContent="";
+
+  window.scrollTo({top:0,behavior:"smooth"});
 }
+
 function clearForm(resetMessage=true){
- editingId=null;el("stockForm").reset();el("formTitle").textContent="新增口袋標的／交易計畫";el("saveBtn").textContent="儲存交易計畫";
- if(resetMessage)el("formMessage").textContent="";
+  editingId=null;
+  el("stockForm").reset();
+  el("formTitle").textContent="新增口袋標的／交易計畫";
+  el("saveBtn").textContent="儲存交易計畫";
+
+  if(resetMessage){
+    el("formMessage").textContent="";
+  }
 }
+
 async function deleteStock(id){
- if(!currentUser)return;
- const s=stocks.find(x=>String(x.id)===String(id));
- if(!confirm(`確定刪除「${s?.name||"這筆標的"}」？此動作無法復原。`))return;
- const {error}=await sb.from("pocket_stocks").delete().eq("id",id);
- if(error){alert("刪除失敗："+error.message);return}await loadData();
+  if(!currentUser)return;
+
+  const s=stocks.find(x=>String(x.id)===String(id));
+
+  if(!confirm(`確定刪除「${s?.name||"這筆標的"}」？此動作無法復原。`)){
+    return;
+  }
+
+  const {error}=await sb
+    .from("pocket_stocks")
+    .delete()
+    .eq("id",id);
+
+  if(error){
+    alert("刪除失敗："+error.message);
+    return;
+  }
+
+  await loadData();
 }
+
 function datum(label,value,full=false){
- if(value===null||value===undefined||String(value).trim()==="")return "";
- return `<div class="datum ${full?"full":""}"><div class="k">${esc(label)}</div><div class="v">${esc(value)}</div></div>`;
+  if(value===null||value===undefined||String(value).trim()===""){
+    return "";
+  }
+
+  return `<div class="datum ${full?"full":""}">
+    <div class="k">${esc(label)}</div>
+    <div class="v">${esc(value)}</div>
+  </div>`;
 }
+
 function renderStocks(){
- const q=val("search").toLowerCase();const fs=el("filterStatus").value;const fr=el("filterReview").value;
- const filtered=stocks.filter(s=>{
-  const hay=[s.name,s.symbol,s.pattern,s.key_price,s.entry_price,s.stop_price,s.target_price,s.hypothesis,s.key_price_meaning,s.entry_trigger,s.memo].join(" ").toLowerCase();
-  return (!q||hay.includes(q))&&(fs==="all"||s.status===fs)&& (fr==="all"||(s.review_status||"pending")===fr);
- });
- el("count").textContent=`${filtered.length} 檔`;
- if(!filtered.length){el("list").innerHTML=`<div class="empty">沒有符合條件的標的</div>`;return}
- el("list").innerHTML=filtered.map(s=>{
- const yahoo=s.symbol?`https://tw.stock.yahoo.com/quote/${encodeURIComponent(s.symbol)}.TW`:"#";
- const labelStatus=statusLabels[s.status]||s.status||"未設定";
- const labelReview=reviewLabels[s.review_status||"pending"]||"待驗證";
- return `<article class="stock">
- <div class="row"><div><h3><a href="${yahoo}" target="_blank" rel="noopener">${esc(s.name)} <span class="small">${esc(s.symbol)}</span> ↗</a></h3><div class="small">${esc(s.pattern||"未設定型態")}｜${esc(s.timeframe||"未設定週期")}</div></div><div style="display:flex;gap:6px;flex-wrap:wrap"><span class="badge">${esc(labelStatus)}</span><span class="badge">${esc(labelReview)}</span></div></div>
- <div class="stock-grid">
- ${datum("關鍵價",s.key_price)}${datum("預計進場",s.entry_price)}
- ${datum("停損／失效價",s.stop_price)}${datum("目標價",s.target_price)}
- ${datum("選股假設",s.hypothesis,true)}${datum("關鍵價意義",s.key_price_meaning,true)}
- ${datum("進場觸發條件",s.entry_trigger,true)}${datum("停損／型態失效依據",s.stop_reason,true)}
- ${datum("目標與移動停利規則",s.trailing_rule,true)}${datum("事後檢討日期",s.review_date)}
- ${datum("實際走勢／執行檢討",s.review_notes,true)}${datum("其他備註",s.memo,true)}
- </div>
- ${currentUser?`<div class="actions"><button class="primary" onclick="editStock('${String(s.id).replace(/'/g,"")}')">編輯計畫</button><button class="red" onclick="deleteStock('${String(s.id).replace(/'/g,"")}')">刪除</button></div>`:""}
- </article>`;
- }).join("");
+  const q=val("search").toLowerCase();
+  const fs=el("filterStatus").value;
+  const fr=el("filterReview").value;
+
+  const filtered=stocks.filter(s=>{
+    const hay=[
+      s.name,
+      s.symbol,
+      s.pattern,
+      s.key_price,
+      s.entry_price,
+      s.stop_price,
+      s.target_price,
+      s.hypothesis,
+      s.key_price_meaning,
+      s.entry_trigger,
+      s.memo
+    ].join(" ").toLowerCase();
+
+    return (!q||hay.includes(q))
+      &&(fs==="all"||s.status===fs)
+      &&(fr==="all"||(s.review_status||"pending")===fr);
+  });
+
+  el("count").textContent=`${filtered.length} 檔`;
+
+  if(!filtered.length){
+    el("list").innerHTML=
+      `<div class="empty">沒有符合條件的標的</div>`;
+    return;
+  }
+
+  el("list").innerHTML=filtered.map(s=>{
+    const symbol=String(s.symbol||"");
+    const yahoo=symbol
+      ?`https://tw.stock.yahoo.com/quote/${encodeURIComponent(symbol)}`
+      :"#";
+
+    const labelStatus=statusLabels[s.status]||s.status||"未設定";
+    const labelReview=reviewLabels[s.review_status||"pending"]||"待驗證";
+
+    return `<article class="stock">
+      <div class="row">
+        <div>
+          <h3>
+            <a href="${yahoo}" target="_blank" rel="noopener">
+              ${esc(s.name)}
+              <span class="small">${esc(s.symbol)}</span> ↗
+            </a>
+          </h3>
+          <div class="small">
+            ${esc(s.pattern||"未設定型態")}｜
+            ${esc(s.timeframe||"未設定週期")}
+          </div>
+        </div>
+
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <span class="badge">${esc(labelStatus)}</span>
+          <span class="badge">${esc(labelReview)}</span>
+        </div>
+      </div>
+
+      <div class="stock-grid">
+        ${datum("關鍵價",s.key_price)}
+        ${datum("預計進場",s.entry_price)}
+        ${datum("停損／失效價",s.stop_price)}
+        ${datum("目標價",s.target_price)}
+        ${datum("選股假設",s.hypothesis,true)}
+        ${datum("關鍵價意義",s.key_price_meaning,true)}
+        ${datum("進場觸發條件",s.entry_trigger,true)}
+        ${datum("停損／型態失效依據",s.stop_reason,true)}
+        ${datum("目標與移動停利規則",s.trailing_rule,true)}
+        ${datum("事後檢討日期",s.review_date)}
+        ${datum("實際走勢／執行檢討",s.review_notes,true)}
+        ${datum("其他備註",s.memo,true)}
+      </div>
+
+      ${currentUser?`
+        <div class="actions">
+          <button class="primary"
+            onclick="editStock('${String(s.id).replace(/'/g,"")}')">
+            編輯計畫
+          </button>
+          <button class="red"
+            onclick="deleteStock('${String(s.id).replace(/'/g,"")}')">
+            刪除
+          </button>
+        </div>
+      `:""}
+    </article>`;
+  }).join("");
 }
-sb.auth.getSession().then(({data})=>{currentUser=data.session?.user||null;updateAuthUI();loadData()});
-sb.auth.onAuthStateChange((_event,session)=>{currentUser=session?.user||null;updateAuthUI()});
+
+/* 先確認登入狀態，再載入口袋名單 */
+async function initializeApp(){
+  try{
+    const {data,error}=await sb.auth.getSession();
+
+    if(error) throw error;
+
+    currentUser=data.session?.user||null;
+    updateAuthUI();
+
+    await loadData();
+
+  }catch(error){
+    el("loadMessage").textContent=
+      "網站初始化遇到問題："+(error.message||"請重新整理頁面");
+
+    hidePageLoader();
+  }
+}
+
+sb.auth.onAuthStateChange((_event,session)=>{
+  currentUser=session?.user||null;
+  updateAuthUI();
+});
+
+initializeApp();
 </script>
+
 </body>
 </html>
