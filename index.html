@@ -32,7 +32,7 @@ body{
   line-height:1.5
 }
 
-/* 載入動畫 */
+/* 載入動畫：至少顯示 3 秒 */
 #pageLoader{
   position:fixed;
   inset:0;
@@ -44,7 +44,9 @@ body{
   gap:18px;
   background:#070d18;
   color:#e5edf8;
-  transition:opacity .3s ease,visibility .3s ease
+  opacity:1;
+  visibility:visible;
+  transition:opacity .65s ease,visibility .65s ease
 }
 
 #pageLoader.loader-hidden{
@@ -54,24 +56,25 @@ body{
 }
 
 .loader-spinner{
-  width:48px;
-  height:48px;
+  width:52px;
+  height:52px;
   border:4px solid #26364d;
   border-top-color:#60a5fa;
   border-right-color:#60a5fa;
   border-radius:50%;
-  animation:huntingSpin .8s linear infinite
+  animation:huntingSpin .9s linear infinite
 }
 
 .loader-title{
-  font-size:20px;
+  font-size:21px;
   font-weight:750;
-  letter-spacing:1px
+  letter-spacing:1.5px
 }
 
 .loader-caption{
   color:#94a3b8;
-  font-size:13px
+  font-size:13px;
+  letter-spacing:.5px
 }
 
 @keyframes huntingSpin{
@@ -79,7 +82,8 @@ body{
 }
 
 @media(prefers-reduced-motion:reduce){
-  .loader-spinner{animation-duration:2s}
+  .loader-spinner{animation:none}
+  #pageLoader{transition:opacity .2s ease,visibility .2s ease}
 }
 
 header{
@@ -286,7 +290,7 @@ label{
 
 <body>
 
-<!-- 網頁初次開啟時顯示的載入畫面 -->
+<!-- 網頁開場動畫 -->
 <div id="pageLoader" role="status" aria-live="polite">
   <div class="loader-spinner"></div>
   <div class="loader-title">台股狩獵場 v3</div>
@@ -312,11 +316,11 @@ label{
   <h2>管理員登入</h2>
   <div class="grid">
     <div class="field">
-      <label>Email</label>
+      <label for="loginEmail">Email</label>
       <input id="loginEmail" type="email" autocomplete="username" placeholder="管理員 Email">
     </div>
     <div class="field">
-      <label>密碼</label>
+      <label for="loginPassword">密碼</label>
       <input id="loginPassword" type="password" autocomplete="current-password" placeholder="密碼">
     </div>
   </div>
@@ -497,8 +501,10 @@ label{
   <div id="list"></div>
 </section>
 
+<!-- 風險提醒：保留原意，不移除 -->
 <p class="small">
   注意：本工具用於記錄個人觀察與交易計畫，不會自動判斷買賣點，也不保證交易結果。
+  口袋名單僅供個人觀察與研究參考，不構成投資建議；請自行判斷、管理風險，並依照事前交易計畫執行。
 </p>
 
 </main>
@@ -512,6 +518,36 @@ const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 let stocks = [];
 let currentUser = null;
 let editingId = null;
+
+/* ===== 載入動畫控制 ===== */
+const MIN_LOADER_MS = 3000;
+const loaderStartedAt = Date.now();
+let loaderHidePromise = null;
+
+/*
+  至少顯示 3 秒。
+  如果雲端資料還在載入，則等資料載入流程完成後才呼叫。
+  使用同一個 Promise，避免多次呼叫造成動畫控制混亂。
+*/
+function hidePageLoader(){
+  if(loaderHidePromise) return loaderHidePromise;
+
+  loaderHidePromise = (async()=>{
+    const elapsed = Date.now() - loaderStartedAt;
+    const remaining = Math.max(0, MIN_LOADER_MS - elapsed);
+
+    if(remaining > 0){
+      await new Promise(resolve=>setTimeout(resolve,remaining));
+    }
+
+    const loader = el("pageLoader");
+    if(loader){
+      loader.classList.add("loader-hidden");
+    }
+  })();
+
+  return loaderHidePromise;
+}
 
 const fields = {
   name:"name",
@@ -554,12 +590,6 @@ function el(id){
 
 function val(id){
   return el(id).value.trim();
-}
-
-/* 關閉初次載入動畫 */
-function hidePageLoader(){
-  const loader = el("pageLoader");
-  if(loader) loader.classList.add("loader-hidden");
 }
 
 function esc(s){
@@ -626,7 +656,7 @@ function updateAuthUI(){
   el("adminPanel").classList.toggle("hidden",!currentUser);
 }
 
-/* 載入雲端資料；初次載入完成後關閉動畫 */
+/* ===== 載入雲端資料 ===== */
 async function loadData(){
   el("loadMessage").textContent="正在載入資料…";
 
@@ -660,7 +690,7 @@ async function loadData(){
     renderStocks();
 
   }finally{
-    hidePageLoader();
+    await hidePageLoader();
   }
 }
 
@@ -881,7 +911,7 @@ function renderStocks(){
   }).join("");
 }
 
-/* 先確認登入狀態，再載入口袋名單 */
+/* ===== 初始化網站 ===== */
 async function initializeApp(){
   try{
     const {data,error}=await sb.auth.getSession();
@@ -897,7 +927,8 @@ async function initializeApp(){
     el("loadMessage").textContent=
       "網站初始化遇到問題："+(error.message||"請重新整理頁面");
 
-    hidePageLoader();
+    // 即使初始化失敗，也保證開場畫面至少顯示 3 秒後退出
+    await hidePageLoader();
   }
 }
 
