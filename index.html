@@ -32,7 +32,7 @@ body{
   line-height:1.5
 }
 
-/* 載入動畫：至少顯示 3 秒 */
+/* 載入動畫：至少顯示 4 秒 */
 #pageLoader{
   position:fixed;
   inset:0;
@@ -62,7 +62,7 @@ body{
   border-top-color:#60a5fa;
   border-right-color:#60a5fa;
   border-radius:50%;
-  animation:huntingSpin .9s linear infinite
+  animation:huntingSpin 1.8s linear infinite
 }
 
 .loader-title{
@@ -520,12 +520,12 @@ let currentUser = null;
 let editingId = null;
 
 /* ===== 載入動畫控制 ===== */
-const MIN_LOADER_MS = 3000;
+const MIN_LOADER_MS = 4000;
 const loaderStartedAt = Date.now();
 let loaderHidePromise = null;
 
 /*
-  至少顯示 3 秒。
+  至少顯示 4 秒。
   如果雲端資料還在載入，則等資料載入流程完成後才呼叫。
   使用同一個 Promise，避免多次呼叫造成動畫控制混亂。
 */
@@ -927,7 +927,7 @@ async function initializeApp(){
     el("loadMessage").textContent=
       "網站初始化遇到問題："+(error.message||"請重新整理頁面");
 
-    // 即使初始化失敗，也保證開場畫面至少顯示 3 秒後退出
+    // 即使初始化失敗，也保證開場畫面至少顯示 4 秒後退出
     await hidePageLoader();
   }
 }
