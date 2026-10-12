@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#070d18">
+<title>台股狩獵場｜Yahoo 行情連線測試</title>
+<style>
+:root{color-scheme:dark;--bg:#070d18;--panel:#111b2c;--line:#2b3b52;--text:#eef4ff;--muted:#a9b8ce;--blue:#75b7ff;--green:#78e0ad;--red:#ff8e8e;--yellow:#ffd27a}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(circle at top,#14233b 0,#070d18 48%);color:var(--text);font:16px/1.6 system-ui,-apple-system,"Noto Sans TC",sans-serif;padding:18px}
+main{max-width:720px;margin:0 auto}
+h1{font-size:1.45rem;margin:0 0 6px}
+.sub{color:var(--muted);margin:0 0 18px}
+.card{background:rgba(17,27,44,.96);border:1px solid var(--line);border-radius:16px;padding:16px;margin:14px 0}
+label{display:block;font-weight:700;margin:10px 0 5px}
+input{width:100%;padding:12px;border-radius:10px;border:1px solid #42536b;background:#08111f;color:var(--text);font-size:16px}
+button{border:0;border-radius:10px;background:#2e7bd5;color:white;font-weight:800;font-size:16px;padding:13px 16px;width:100%;margin-top:14px}
+button:disabled{opacity:.6}
+.note{font-size:.9rem;color:var(--muted)}
+.status{padding:12px;border-radius:10px;background:#08111f;border:1px solid var(--line);margin-top:12px;overflow-wrap:anywhere}
+.good{color:var(--green)}.bad{color:var(--red)}.warn{color:var(--yellow)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.metric{padding:12px;background:#08111f;border:1px solid var(--line);border-radius:10px}
+.metric small{display:block;color:var(--muted)}
+.metric strong{font-size:1.2rem;overflow-wrap:anywhere}
+pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#08111f;padding:12px;border-radius:10px;color:#cbd9eb;font-size:12px;max-height:220px;overflow:auto}
+footer{font-size:.85rem;color:var(--muted);padding:8px 2px 24px}
+@media(max-width:420px){body{padding:12px}.grid{grid-template-columns:1fr 1fr}.metric strong{font-size:1.05rem}}
+</style>
+</head>
+<body>
+<main>
+  <h1>台股狩獵場｜Yahoo 行情連線測試</h1>
+  <p class="sub">獨立測試頁，不連接或修改 Supabase，也不會更動 v3。</p>
+
+  <section class="card">
+    <label for="symbol">Yahoo 股票代號</label>
+    <input id="symbol" value="2330.TW" autocomplete="off" spellcheck="false">
+    <p class="note">台股上市通常用 .TW，例如 2330.TW；上櫃通常用 .TWO，例如 6488.TWO。</p>
+
+    <label for="entry">你的計畫進場價（元）</label>
+    <input id="entry" type="number" inputmode="decimal" value="2540" min="0" step="0.01">
+    <p class="note">提醒區間採進場價 ±3%，上下界都算在區間內。</p>
+
+    <button id="test">測試網站讀取 Yahoo 行情</button>
+    <div id="status" class="status">尚未測試。按上方按鈕開始。</div>
+  </section>
+
+  <section class="card">
+    <h2 style="font-size:1.1rem;margin:0 0 12px">測試結果</h2>
+    <div class="grid">
+      <div class="metric"><small>Yahoo 回傳價格</small><strong id="price">—</strong></div>
+      <div class="metric"><small>行情資料時間</small><strong id="time">—</strong></div>
+      <div class="metric"><small>提醒區間下限（-3%）</small><strong id="low">—</strong></div>
+      <div class="metric"><small>提醒區間上限（+3%）</small><strong id="high">—</strong></div>
+    </div>
+    <div id="alert" class="status">尚未判斷是否進入提醒區間。</div>
+    <p class="note">價格是 Yahoo 此端點實際回傳的資料，可能延遲或非即時；本頁只作連線測試，不是下單或投資建議。</p>
+  </section>
+
+  <section class="card">
+    <h2 style="font-size:1.1rem;margin:0 0 8px">技術結果</h2>
+    <div id="tech" class="status">尚未測試。</div>
+    <details style="margin-top:10px">
+      <summary>查看回傳資料摘要</summary>
+      <pre id="raw">尚無資料</pre>
+    </details>
+  </section>
+
+  <footer>資料來源：Yahoo Finance。此頁只在你按下測試時查詢，不會在背景監控；關閉頁面後不會繼續提醒。</footer>
+</main>
+<script>
+const $ = id => document.getElementById(id);
+function money(n){
+  if (typeof n !== "number" || !Number.isFinite(n)) return "—";
+  return n.toLocaleString("zh-TW",{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+function setStatus(message, cls=""){
+  $("status").className = "status " + cls;
+  $("status").textContent = message;
+}
+$("test").addEventListener("click", async () => {
+  const symbol = $("symbol").value.trim().toUpperCase();
+  const entry = Number($("entry").value);
+  $("price").textContent = "讀取中…";
+  $("time").textContent = "讀取中…";
+  $("low").textContent = "—";
+  $("high").textContent = "—";
+  $("alert").textContent = "等待行情資料…";
+  $("tech").textContent = "正在執行 fetch 跨網域測試…";
+  $("raw").textContent = "讀取中…";
+  $("test").disabled = true;
+
+  try {
+    if (!symbol) throw new Error("請輸入 Yahoo 股票代號，例如 2330.TW。");
+    if (!Number.isFinite(entry) || entry <= 0) throw new Error("請輸入大於 0 的計畫進場價。");
+
+    const url = "https://query1.finance.yahoo.com/v8/finance/chart/" +
+      encodeURIComponent(symbol) + "?range=1d&interval=1d";
+    const response = await fetch(url, {method:"GET", cache:"no-store"});
+    if (!response.ok) throw new Error("Yahoo 回應 HTTP " + response.status + "。可能是服務限制、代號錯誤或請求被拒絕。");
+    const json = await response.json();
+    if (json.chart && json.chart.error) {
+      throw new Error("Yahoo 回傳錯誤：" + (json.chart.error.description || "未知錯誤"));
+    }
+    const result = json.chart && json.chart.result && json.chart.result[0];
+    if (!result) throw new Error("回應中沒有行情 result，請確認股票代號是否正確。");
+
+    const meta = result.meta || {};
+    const quote = result.indicators && result.indicators.quote && result.indicators.quote[0];
+    const closes = quote && quote.close ? quote.close.filter(v => typeof v === "number" && Number.isFinite(v)) : [];
+    const price = (typeof meta.regularMarketPrice === "number" && Number.isFinite(meta.regularMarketPrice))
+      ? meta.regularMarketPrice : (closes.length ? closes[closes.length - 1] : null);
+    if (price === null) throw new Error("有取得回應，但找不到可用價格。");
+
+    const lower = entry * 0.97;
+    const upper = entry * 1.03;
+    const timestamp = meta.regularMarketTime || (result.timestamp && result.timestamp[result.timestamp.length - 1]);
+    const timeText = timestamp ? new Date(timestamp * 1000).toLocaleString("zh-TW",{hour12:false}) : "Yahoo 未提供時間";
+    const currency = meta.currency || "TWD";
+    $("price").textContent = money(price) + " " + currency;
+    $("time").textContent = timeText;
+    $("low").textContent = money(lower);
+    $("high").textContent = money(upper);
+    if (price >= lower && price <= upper) {
+      $("alert").textContent = "已進入 ±3% 提醒區間（測試成功）。";
+      $("alert").className = "status good";
+    } else {
+      $("alert").textContent = "目前價格不在 ±3% 區間內（行情讀取成功，提醒判斷也已執行）。";
+      $("alert").className = "status warn";
+    }
+    setStatus("成功：網頁程式已讀取 Yahoo 行情資料。", "good");
+    $("tech").textContent = "fetch 成功；HTTP " + response.status + "；代號 " + (meta.symbol || symbol) +
+      "；資料來源端點已回傳 JSON。這表示目前瀏覽器環境可讀取此端點，但 Yahoo 非官方公開 API，未來仍可能變更或限制。";
+    $("raw").textContent = JSON.stringify({
+      symbol: meta.symbol || symbol,
+      exchangeName: meta.exchangeName || null,
+      currency,
+      regularMarketPrice: meta.regularMarketPrice ?? null,
+      selectedPrice: price,
+      regularMarketTime: timestamp ? new Date(timestamp * 1000).toISOString() : null,
+      entryPrice: entry,
+      alertRange: {low: lower, high: upper}
+    }, null, 2);
+  } catch (err) {
+    $("price").textContent = "失敗";
+    $("time").textContent = "—";
+    $("alert").textContent = "尚未完成價格區間判斷。";
+    $("alert").className = "status bad";
+    const msg = err && err.message ? err.message : String(err);
+    setStatus("讀取失敗：" + msg, "bad");
+    $("tech").textContent = "瀏覽器 fetch 沒有成功完成。若直接開 Yahoo 網址能看到 JSON、但此處失敗，常見原因是 CORS 跨網域限制或 Yahoo 限制請求。請截圖回傳錯誤，不要修改 Supabase 設定。";
+    $("raw").textContent = msg + "\n\n如果畫面提到 Failed to fetch，可能是 CORS/網路限制；這不等於股票代號一定錯誤。";
+  } finally {
+    $("test").disabled = false;
+  }
+});
+</script>
+</body>
+</html>
